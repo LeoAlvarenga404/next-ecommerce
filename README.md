@@ -17,8 +17,8 @@ Projeto full stack de e-commerce utilizando **Next.js (App Router)**, **Prisma O
 ### 1. Clone o repositório.
 
 ```bash
-git clone https://github.com/LeoAlvarenga404/nextecommerce.git
-cd nextecommerce
+git clone https://github.com/LeoAlvarenga404/next-ecommerce.git
+cd next-ecommerce
 ```
 
 ### 2. Execute o Docker Compose

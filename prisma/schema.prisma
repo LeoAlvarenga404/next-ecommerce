@@ -8,14 +8,26 @@ datasource db {
 }
 
 model User {
-  user_id      String         @id @default(uuid())
-  email        String         @unique
-  name         String?
-  password     String
+  user_id  String  @id @default(uuid())
+  email    String  @unique
+  name     String?
+  password String
+
+  phone String?
+  role  UserRole @default(CUSTOMER)
+
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
   Order        Order[]
-  Cart         Cart[]
+  Cart         Cart?
   UserAddress  UserAddress[]
   RefreshToken RefreshToken[]
+}
+
+enum UserRole {
+  CUSTOMER
+  ADMIN
 }
 
 model RefreshToken {
@@ -29,27 +41,59 @@ model RefreshToken {
 }
 
 model Product {
-  product_id  String      @id @default(uuid())
+  product_id  String  @id @default(uuid())
   name        String
   price       Float
   description String?
   stock       Int
+
+  sku String? @unique
+
   OrderItem   OrderItem[]
   CartItem    CartItem[]
   category_id String?
 
-  Category Category? @relation("CategoryProducts", fields: [category_id], references: [category_id])
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  Category     Category?      @relation("CategoryProducts", fields: [category_id], references: [category_id])
+  ProductImage ProductImage[]
+}
+
+model ProductImage {
+  image_id   String @id @default(uuid())
+  product_id String
+  url        String
+
+  product Product @relation(fields: [product_id], references: [product_id])
+
+  @@unique([product_id, url], name: "unique_product_image")
 }
 
 model Order {
-  order_id   String   @id @default(uuid())
-  user_id    String
-  total      Float
+  order_id String @id @default(uuid())
+  user_id  String
+
+  total            Float
+  status           OrderStatus @default(PENDING)
+  shipping_address String?
+  tracking_code    String?
+
   created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
 
   user      User        @relation(fields: [user_id], references: [user_id])
   OrderItem OrderItem[]
   Payment   Payment[]
+}
+
+enum OrderStatus {
+  PENDING
+  CONFIRMED
+  PROCESSING
+  SHIPPED
+  DELIVERED
+  CANCELLED
 }
 
 model OrderItem {
@@ -58,14 +102,17 @@ model OrderItem {
   product_id    String
   quantity      Int
 
+  unit_price Float
+
   order   Order   @relation(fields: [order_id], references: [order_id])
   product Product @relation(fields: [product_id], references: [product_id])
 }
 
 model Cart {
   cart_id    String   @id @default(uuid())
-  user_id    String
+  user_id    String   @unique
   created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
 
   user     User       @relation(fields: [user_id], references: [user_id])
   CartItem CartItem[]
@@ -100,12 +147,18 @@ model UserAddress {
   @@unique([user_id, street, city, state, zip_code], name: "unique_user_address")
 }
 
+enum PaymentStatus {
+  PENDING
+  COMPLETED
+  FAILED
+}
+
 model Payment {
-  payment_id String   @id @default(uuid())
+  payment_id String        @id @default(uuid())
   order_id   String
   amount     Float
-  status     String // e.g., "pending", "completed", "failed"
-  created_at DateTime @default(now())
+  status     PaymentStatus
+  created_at DateTime      @default(now())
 
   order Order @relation(fields: [order_id], references: [order_id])
 }
