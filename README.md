@@ -1,36 +1,56 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Next Ecommerce
 
-## Getting Started
+Projeto full stack de e-commerce utilizando **Next.js (App Router)**, **Prisma ORM** e **PostgreSQL**.
 
-First, run the development server:
+---
+
+## Requisitos
+
+- [Docker + Docker Compose](https://www.docker.com/)
+- [Node.js (v18+ recomendado)](https://nodejs.org/)
+- [npm](https://www.npmjs.com/) ou `pnpm`, `yarn`
+
+---
+
+## Instalação e Execução
+
+### 1. Clone o repositório.
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+git clone https://github.com/LeoAlvarenga404/nextecommerce.git
+cd nextecommerce
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### 2. Execute o Docker Compose
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```bash
+docker compose up -d
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+### 3. Configure o `.env`
 
-## Learn More
+```bash
+DATABASE_URL="postgresql://postgres:123456@localhost:5432/nextecommerce"
+```
 
-To learn more about Next.js, take a look at the following resources:
+### 4. Instale as dependências
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+```bash
+npm install
+# ou
+pnpm install
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+### 5. Rode as migrations do Prisma
 
-## Deploy on Vercel
+```bash
+npx prisma migrate dev --name init
+```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+### 6. Inicie o servidor
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+```bash
+pnpm dev
+# ou
+npm run dev
+```

@@ -1,0 +1,111 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  user_id      String         @id @default(uuid())
+  email        String         @unique
+  name         String?
+  password     String
+  Order        Order[]
+  Cart         Cart[]
+  UserAddress  UserAddress[]
+  RefreshToken RefreshToken[]
+}
+
+model RefreshToken {
+  id         String   @id @default(uuid())
+  user_id    String
+  token      String   @unique
+  created_at DateTime @default(now())
+  expires_at DateTime
+
+  user User @relation(fields: [user_id], references: [user_id])
+}
+
+model Product {
+  product_id  String      @id @default(uuid())
+  name        String
+  price       Float
+  description String?
+  stock       Int
+  OrderItem   OrderItem[]
+  CartItem    CartItem[]
+  category_id String?
+
+  Category Category? @relation("CategoryProducts", fields: [category_id], references: [category_id])
+}
+
+model Order {
+  order_id   String   @id @default(uuid())
+  user_id    String
+  total      Float
+  created_at DateTime @default(now())
+
+  user      User        @relation(fields: [user_id], references: [user_id])
+  OrderItem OrderItem[]
+  Payment   Payment[]
+}
+
+model OrderItem {
+  order_item_id String @id @default(uuid())
+  order_id      String
+  product_id    String
+  quantity      Int
+
+  order   Order   @relation(fields: [order_id], references: [order_id])
+  product Product @relation(fields: [product_id], references: [product_id])
+}
+
+model Cart {
+  cart_id    String   @id @default(uuid())
+  user_id    String
+  created_at DateTime @default(now())
+
+  user     User       @relation(fields: [user_id], references: [user_id])
+  CartItem CartItem[]
+}
+
+model CartItem {
+  cart_item_id String @id @default(uuid())
+  cart_id      String
+  product_id   String
+  quantity     Int
+
+  cart    Cart    @relation(fields: [cart_id], references: [cart_id])
+  product Product @relation(fields: [product_id], references: [product_id])
+}
+
+model Category {
+  category_id String    @id @default(uuid())
+  name        String    @unique
+  products    Product[] @relation("CategoryProducts")
+}
+
+model UserAddress {
+  address_id String @id @default(uuid())
+  user_id    String
+  street     String
+  city       String
+  state      String
+  zip_code   String
+
+  user User @relation(fields: [user_id], references: [user_id])
+
+  @@unique([user_id, street, city, state, zip_code], name: "unique_user_address")
+}
+
+model Payment {
+  payment_id String   @id @default(uuid())
+  order_id   String
+  amount     Float
+  status     String // e.g., "pending", "completed", "failed"
+  created_at DateTime @default(now())
+
+  order Order @relation(fields: [order_id], references: [order_id])
+}
