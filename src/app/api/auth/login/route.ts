@@ -61,7 +61,7 @@ export async function POST(request: NextRequest) {
       },
     });
 
-    setAuthCookies(accessToken, refreshToken);
+    await setAuthCookies(accessToken, refreshToken);
 
     return NextResponse.json(
       {
@@ -78,7 +78,7 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     console.error("Erro ao fazer login:", error);
     return NextResponse.json(
-      { error: `Erro interno do servidor` },
+      { error: "Erro interno do servidor" },
       { status: 500 }
     );
   }

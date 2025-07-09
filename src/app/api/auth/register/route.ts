@@ -82,7 +82,7 @@ export async function POST(request: NextRequest) {
       },
     });
 
-    setAuthCookies(accesstoken, refreshToken);
+    await setAuthCookies(accesstoken, refreshToken);
 
     return NextResponse.json(
       {

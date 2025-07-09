@@ -16,7 +16,7 @@ export interface JWTPayload {
 
 export async function createAccessToken(payload: Omit<JWTPayload, "exp">) {
   return await new SignJWT(payload)
-    .setProtectedHeader({ alg: "HS526" })
+    .setProtectedHeader({ alg: "HS512" })
     .setIssuedAt()
     .setExpirationTime("15m")
     .sign(secret);
@@ -24,11 +24,11 @@ export async function createAccessToken(payload: Omit<JWTPayload, "exp">) {
 
 export async function createRefreshToken(payload: Omit<JWTPayload, "exp">) {
   return await new SignJWT(payload)
-    .setProtectedHeader({ alg: "HS526" })
+    .setProtectedHeader({ alg: "HS512" })
     .setIssuedAt()
     .setExpirationTime("7d")
     .sign(secret);
-}
+}  
 
 export async function verifyToken(token: string) {
   try {
@@ -40,8 +40,8 @@ export async function verifyToken(token: string) {
 }
 
 export async function getSession() {
-  const cookieStore = cookies();
-  const token = (await cookieStore).get("access_token")?.value;
+  const cookieStore = await cookies();
+  const token = cookieStore.get("access_token")?.value;
 
   if (!token) return null;
   try {
@@ -53,28 +53,29 @@ export async function getSession() {
   }
 }
 
+// Função para definir cookies diretamente no cookieStore
 export async function setAuthCookies(
   accessToken: string,
   refreshToken: string
 ) {
   const cookieStore = await cookies();
 
-  if (accessToken && accessToken.length > 0) {
+  if (accessToken) {
     cookieStore.set("access_token", accessToken, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       sameSite: "strict",
-      maxAge: 15 * 60,
+      maxAge: 15 * 60, // 15 minutos
       path: "/",
     });
   }
 
-  if (refreshToken && refreshToken.length > 0) {
+  if (refreshToken) {
     cookieStore.set("refresh_token", refreshToken, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       sameSite: "strict",
-      maxAge: 7 * 24 * 60 * 60,
+      maxAge: 7 * 24 * 60 * 60, // 7 dias
       path: "/",
     });
   }

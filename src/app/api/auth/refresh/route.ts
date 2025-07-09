@@ -35,7 +35,7 @@ export async function POST() {
       role: tokenRecord.user.role,
     });
 
-    setAuthCookies(newAccessToken, "");
+    await setAuthCookies(newAccessToken, "");
 
     return NextResponse.json({
       message: "Token renovado com sucesso",

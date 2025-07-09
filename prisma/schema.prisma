@@ -74,10 +74,12 @@ model Order {
   order_id String @id @default(uuid())
   user_id  String
 
-  total            Float
-  status           OrderStatus @default(PENDING)
-  shipping_address String?
-  tracking_code    String?
+  total                    Float
+  status                   OrderStatus @default(PENDING)
+  shipping_address         String?
+  tracking_code            String?
+  stripe_session_id        String?     @unique
+  stripe_payment_intent_id String?     @unique
 
   created_at DateTime @default(now())
   updated_at DateTime @updatedAt
@@ -88,6 +90,8 @@ model Order {
 }
 
 enum OrderStatus {
+  PAID
+  FAILED
   PENDING
   CONFIRMED
   PROCESSING
