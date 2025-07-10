@@ -53,7 +53,7 @@ export async function POST(request: NextRequest) {
               product_id: item.product_id,
               quantity: item.quantity,
               unit_price: item.product.price,
-            })), 
+            })),
           });
 
           for (const item of cart.CartItem) {

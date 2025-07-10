@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getSession } from "@/lib/auth";
+import { getSession } from "./src/lib/auth";
 
 export async function middleware(request: NextRequest) {
   const session = await getSession();
@@ -23,9 +23,5 @@ export async function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: [
-    "/profile/:path*",
-    "/checkout/:path*",
-    "/admin/:path*"
-  ],
-}
+  matcher: ["/profile/:path*", "/checkout/:path*", "/admin/:path*"],
+};

@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
 import { DM_Sans, Playfair_Display } from "next/font/google";
 import "./globals.css";
-import { Header } from "./components/layouts/header";
+import { Header } from "@/components/layouts/header";
+import { QueryProvider } from "@/providers/query-provider";
 
 export const fontSans = DM_Sans({
   subsets: ["latin"],
@@ -27,8 +28,10 @@ export default function RootLayout({
       <body
         className={`${fontSans.variable} ${fontSerif.variable} antialiased font-sans`}
       >
-        <Header />
-        {children}
+        <QueryProvider>
+          <Header />
+          {children}
+        </QueryProvider>
       </body>
     </html>
   );
