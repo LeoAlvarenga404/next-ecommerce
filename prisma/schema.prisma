@@ -47,8 +47,7 @@ model Product {
   description String?
   stock       Int
 
-  sku String? @unique
-
+  sku String? @unique  
   OrderItem   OrderItem[]
   CartItem    CartItem[]
   category_id String?
