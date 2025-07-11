@@ -6,7 +6,7 @@ import { clearAuthCookies } from "@/lib/auth";
 export async function POST() {
   try {
     const cookieStore = cookies();
-    const refreshToken = (await cookieStore).get("refreshToken")?.value;
+    const refreshToken = (await cookieStore).get("refresh_token")?.value;
 
     if (refreshToken) {
       await prisma.refreshToken.deleteMany({

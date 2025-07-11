@@ -10,7 +10,7 @@ export function Header() {
     <header className="w-full bg-background border-b border-border">
       <div className="w-full max-w-6xl mx-auto flex items-center justify-between px-4 py-3">
         <h1 className="text-2xl font-semibold tracking-tight text-foreground">
-          E-NEXT
+          <Link href="/">E-NEXT</Link>
         </h1>
 
         <div className="relative w-1/2 max-w-md">
@@ -24,22 +24,22 @@ export function Header() {
         </div>
 
         <div className="flex gap-4 items-center">
-          <a
-            href="#"
+          <Link
+            href="/login"
             className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors"
           >
             <User className="size-5" />
-            <Link href="/login">Sign In</Link>
-          </a>
-          <a
-            href="#"
+            <span>Sign In</span>
+          </Link>
+          <Link
+            href="/cart"
             className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors"
           >
             <div className="relative">
               <ShoppingCart className="size-5" />
             </div>
-            <Link href="/cart">Cart</Link>
-          </a>
+            <span>Cart</span>
+          </Link>
         </div>
       </div>
     </header>

@@ -1,5 +1,6 @@
 import { SignJWT, jwtVerify } from "jose";
 import { cookies } from "next/headers";
+import { prisma } from "@/lib/prisma";
 
 if (!process.env.JWT_SECRET) {
   throw new Error("JWT_SECRET não está definida no ambiente.");
@@ -28,7 +29,7 @@ export async function createRefreshToken(payload: Omit<JWTPayload, "exp">) {
     .setIssuedAt()
     .setExpirationTime("7d")
     .sign(secret);
-}  
+}
 
 export async function verifyToken(token: string) {
   try {
@@ -41,19 +42,52 @@ export async function verifyToken(token: string) {
 
 export async function getSession() {
   const cookieStore = await cookies();
-  const token = cookieStore.get("access_token")?.value;
+  const accessToken = cookieStore.get("access_token")?.value;
 
-  if (!token) return null;
+  if (!accessToken) return null;
+
   try {
-    const payload = await verifyToken(token);
+    const payload = await verifyToken(accessToken);
     return payload;
   } catch (error) {
-    console.error("Erro ao verificar o token:", error);
-    return null;
+    console.error("Access token inválido, tentando renovar:", error);
+    const refreshToken = cookieStore.get("refresh_token")?.value;
+
+    if (!refreshToken) {
+      return null;
+    }
+
+    try {
+      const tokenRecord = await prisma.refreshToken.findUnique({
+        where: { token: refreshToken },
+        include: { user: true },
+      });
+
+      if (!tokenRecord || tokenRecord.expires_at < new Date()) {
+        await clearAuthCookies();
+        return null;
+      }
+
+      await verifyToken(refreshToken);
+
+      const newAccessToken = await createAccessToken({
+        user_id: tokenRecord.user.user_id,
+        email: tokenRecord.user.email,
+        role: tokenRecord.user.role,
+      });
+
+      await setAuthCookies(newAccessToken, refreshToken);
+
+      const newPayload = await verifyToken(newAccessToken);
+      return newPayload;
+    } catch (refreshError) {
+      console.error("Erro durante renovação do token:", refreshError);
+      await clearAuthCookies();
+      return null;
+    }
   }
 }
 
-// Função para definir cookies diretamente no cookieStore
 export async function setAuthCookies(
   accessToken: string,
   refreshToken: string
@@ -65,17 +99,17 @@ export async function setAuthCookies(
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       sameSite: "strict",
-      maxAge: 15 * 60, // 15 minutos
+      maxAge: 30 * 60,
       path: "/",
     });
   }
 
-  if (refreshToken) {
+  if (refreshToken && refreshToken.trim() !== "") {
     cookieStore.set("refresh_token", refreshToken, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       sameSite: "strict",
-      maxAge: 7 * 24 * 60 * 60, // 7 dias
+      maxAge: 7 * 24 * 60 * 60,
       path: "/",
     });
   }

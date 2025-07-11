@@ -15,16 +15,38 @@ export async function POST() {
       );
     }
 
-    await verifyToken(refreshToken);
-
-    const tokenRecord = await prisma.refreshToken.findUnique({
+     const tokenRecord = await prisma.refreshToken.findUnique({
       where: { token: refreshToken },
       include: { user: true },
     });
 
-    if (!tokenRecord || tokenRecord.expires_at < new Date()) {
+    if (!tokenRecord) {
       return NextResponse.json(
-        { error: "Refresh token inválido ou expirado" },
+        { error: "Refresh token não encontrado no banco de dados" },
+        { status: 401 }
+      );
+    }
+
+    if (tokenRecord.expires_at < new Date()) {
+      await prisma.refreshToken.delete({
+        where: { token: refreshToken },
+      });
+
+      return NextResponse.json(
+        { error: "Refresh token expirado" },
+        { status: 401 }
+      );
+    }
+
+    try {
+      await verifyToken(refreshToken);
+    } catch (jwtError) {
+      await prisma.refreshToken.delete({
+        where: { token: refreshToken },
+      });
+
+      return NextResponse.json(
+        { error: "Refresh token inválido" },
         { status: 401 }
       );
     }
@@ -35,14 +57,15 @@ export async function POST() {
       role: tokenRecord.user.role,
     });
 
-    await setAuthCookies(newAccessToken, "");
+    await setAuthCookies(newAccessToken, refreshToken);
 
     return NextResponse.json({
       message: "Token renovado com sucesso",
     });
   } catch (error) {
+    console.error("Erro na rota de refresh:", error);
     return NextResponse.json(
-      { error: `Erro ao processar a requisição: ${error}` },
+      { error: "Erro interno do servidor" },
       { status: 500 }
     );
   }

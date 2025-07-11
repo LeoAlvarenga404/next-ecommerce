@@ -1,10 +1,11 @@
 "use client";
 
-import { useProducts } from "@/hooks/use-products";
+import { useProducts } from "@/hooks/products";
 import { Card } from "@/components/ui/card";
 import { ShoppingCart } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
+import { AddToCart } from "./add-to-cart";
 
 export function Products() {
   const { data, isLoading, error } = useProducts();
@@ -36,7 +37,7 @@ export function Products() {
             <Link href={`/product/${product.product_id}`}>
               <Button>Ver Produto</Button>
             </Link>
-            <ShoppingCart className="text-gray-600 cursor-pointer" />
+            <AddToCart productId={product.product_id} quantity={1} />
           </div>
         </Card>
       ))}

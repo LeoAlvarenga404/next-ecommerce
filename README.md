@@ -14,43 +14,49 @@ Projeto full stack de e-commerce utilizando **Next.js (App Router)**, **Prisma O
 
 ## Instalação e Execução
 
-### 1. Clone o repositório.
+1. **Clone o repositório:**
 
-```bash
-git clone https://github.com/LeoAlvarenga404/next-ecommerce.git
-cd next-ecommerce
-```
+   ```bash
+   git clone https://github.com/LeoAlvarenga404/next-ecommerce.git
+   cd next-ecommerce
+   ```
 
-### 2. Execute o Docker Compose
+2. **Suba o banco de dados com Docker Compose:**
 
-```bash
-docker compose up -d
-```
+   ```bash
+   docker compose up -d
+   ```
 
-### 3. Configure o `.env`
+3. **Configure o arquivo `.env`:**
 
-```bash
-DATABASE_URL="postgresql://postgres:123456@localhost:5432/nextecommerce"
-```
+   ```bash
+   copy .env.example .env   # Windows
+   # ou
+   cp .env.example .env     # Linux/Mac
+   ```
 
-### 4. Instale as dependências
+   Ajuste as variáveis de ambiente se necessário.
 
-```bash
-npm install
-# ou
-pnpm install
-```
+4. **Instale as dependências:**
 
-### 5. Rode as migrations do Prisma
+   ```bash
+   npm install
+   ```
 
-```bash
-npx prisma migrate dev --name init
-```
+5. **Execute o setup completo (migrations + seed):**
 
-### 6. Inicie o servidor
+   ```bash
+   npm run setup
+   ```
 
-```bash
-pnpm dev
-# ou
-npm run dev
-```
+6. **Inicie o servidor de desenvolvimento:**
+   ```bash
+   npm run dev
+   ```
+
+---
+
+- Para rodar apenas a seed novamente:
+  ```bash
+  npm run seed
+  ```
