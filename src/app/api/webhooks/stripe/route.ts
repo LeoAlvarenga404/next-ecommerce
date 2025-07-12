@@ -25,12 +25,10 @@ export async function POST(request: NextRequest) {
           );
         }
 
-        const order = await prisma.order.create({
+        await prisma.order.update({
+          where: { order_id: session.metadata.order_id },
           data: {
-            user_id: session.metadata?.user_id,
-            total: session.amount_total! / 100,
             status: "PAID",
-            stripe_session_id: session.id,
             stripe_payment_intent_id: session.payment_intent as string,
           },
         });
@@ -47,15 +45,6 @@ export async function POST(request: NextRequest) {
         });
 
         if (cart) {
-          await prisma.orderItem.createMany({
-            data: cart.CartItem.map((item) => ({
-              order_id: order.order_id,
-              product_id: item.product_id,
-              quantity: item.quantity,
-              unit_price: item.product.price,
-            })),
-          });
-
           for (const item of cart.CartItem) {
             await prisma.product.update({
               where: { product_id: item.product_id },
@@ -74,10 +63,18 @@ export async function POST(request: NextRequest) {
         break;
       case "payment_intent.payment_failed":
         const failedPayment = event.data.object;
-        await prisma.order.update({
+
+        const failedOrder = await prisma.order.findFirst({
           where: { stripe_payment_intent_id: failedPayment.id },
-          data: { status: "FAILED" },
         });
+
+        if (failedOrder) {
+          await prisma.order.update({
+            where: { order_id: failedOrder.order_id },
+            data: { status: "FAILED" },
+          });
+        }
+
         break;
 
       default:

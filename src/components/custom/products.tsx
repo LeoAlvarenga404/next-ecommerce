@@ -1,6 +1,6 @@
 "use client";
 
-import { useProducts } from "@/hooks/products";
+import { useProducts } from "@/hooks/use-products";
 import { Card } from "@/components/ui/card";
 import { ShoppingCart } from "lucide-react";
 import Link from "next/link";

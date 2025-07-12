@@ -1,5 +1,5 @@
 "use client";
-import { useCart } from "@/hooks/cart";
+import { useCart } from "@/hooks/use-cart";
 import { ShoppingCart } from "lucide-react";
 
 export function AddToCart({

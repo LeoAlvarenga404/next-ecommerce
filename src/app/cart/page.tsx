@@ -2,7 +2,7 @@
 
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { useCart } from "@/hooks/cart";
+import { useCart } from "@/hooks/use-cart";
 import Link from "next/link";
 
 export default function CartPage() {

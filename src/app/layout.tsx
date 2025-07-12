@@ -3,6 +3,7 @@ import { DM_Sans, Playfair_Display } from "next/font/google";
 import "./globals.css";
 import { Header } from "@/components/layouts/header";
 import { QueryProvider } from "@/providers/query-provider";
+import { AuthProvider } from "@/contexts/auth-context";
 
 export const fontSans = DM_Sans({
   subsets: ["latin"],
@@ -29,8 +30,10 @@ export default function RootLayout({
         className={`${fontSans.variable} ${fontSerif.variable} antialiased font-sans`}
       >
         <QueryProvider>
-          <Header />
-          {children}
+          <AuthProvider>
+            <Header />
+            {children}
+          </AuthProvider>
         </QueryProvider>
       </body>
     </html>

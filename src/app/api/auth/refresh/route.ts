@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { verifyToken, createAccessToken, setAuthCookies } from "@/lib/auth";
+import { verifyToken, createAccessToken, setAuthCookies, clearAuthCookies } from "@/lib/auth";
 import { cookies } from "next/headers";
 
 export async function POST() {
@@ -32,6 +32,8 @@ export async function POST() {
         where: { token: refreshToken },
       });
 
+      await clearAuthCookies();
+
       return NextResponse.json(
         { error: "Refresh token expirado" },
         { status: 401 }
@@ -44,6 +46,7 @@ export async function POST() {
       await prisma.refreshToken.delete({
         where: { token: refreshToken },
       });
+      await clearAuthCookies();
 
       return NextResponse.json(
         { error: "Refresh token inválido" },
@@ -64,6 +67,7 @@ export async function POST() {
     });
   } catch (error) {
     console.error("Erro na rota de refresh:", error);
+    await clearAuthCookies();
     return NextResponse.json(
       { error: "Erro interno do servidor" },
       { status: 500 }

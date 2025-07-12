@@ -35,14 +35,6 @@ const carouselData = [
     cta: "Explorar",
     bgGradient: "from-green-500 to-teal-600",
   },
-  {
-    id: 4,
-    title: "Air Jordan Collection",
-    subtitle: "Lendários designs, qualidade incomparável",
-    image: "/api/placeholder/800/400",
-    cta: "Ver Coleção",
-    bgGradient: "from-gray-800 to-black",
-  },
 ];
 
 export function HomeCarousel() {
@@ -91,7 +83,7 @@ export function HomeCarousel() {
                       item.bgGradient
                     )}
                   >
-                    <h1 className="text-9xl text-white">{index}</h1>
+                    <h1 className="text-9xl text-white">{index + 1}</h1>
                   </div>
                 </div>
               </CarouselItem>

@@ -1,11 +1,19 @@
 "use client";
 
 import { Input } from "@/components/ui/input";
-import { ShoppingCart, User, Search } from "lucide-react";
+import {
+  ShoppingCart,
+  User,
+  Search,
+  ListOrdered,
+  LogOut,
+  LogOutIcon,
+} from "lucide-react";
 import { Label } from "@/components/ui/label";
 import Link from "next/link";
-
+import { useAuth } from "@/contexts/auth-context";
 export function Header() {
+  const { isAuthenticated, logout } = useAuth();
   return (
     <header className="w-full bg-background border-b border-border">
       <div className="w-full max-w-6xl mx-auto flex items-center justify-between px-4 py-3">
@@ -25,13 +33,6 @@ export function Header() {
 
         <div className="flex gap-4 items-center">
           <Link
-            href="/login"
-            className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors"
-          >
-            <User className="size-5" />
-            <span>Sign In</span>
-          </Link>
-          <Link
             href="/cart"
             className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors"
           >
@@ -40,6 +41,33 @@ export function Header() {
             </div>
             <span>Cart</span>
           </Link>
+
+          {isAuthenticated && (
+            <Link
+              href="/orders"
+              className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors"
+            >
+              <ListOrdered className="size-5" />
+              <span>Orders</span>
+            </Link>
+          )}
+          {isAuthenticated ? (
+            <div
+              onClick={logout}
+              className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
+            >
+              <LogOutIcon className="size-5" />
+              <span>Logout</span>
+            </div>
+          ) : (
+            <Link
+              href="/login"
+              className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors"
+            >
+              <User className="size-5" />
+              <span>Sign In</span>
+            </Link>
+          )}
         </div>
       </div>
     </header>

@@ -1,6 +1,6 @@
 "use client";
 
-import { useProduct } from "@/hooks/products";
+import { useProduct } from "@/hooks/use-products";
 import { useParams } from "next/navigation";
 
 export default function ProductPage() {
