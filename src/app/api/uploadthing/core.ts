@@ -1,6 +1,9 @@
 import { createUploadthing, type FileRouter } from "uploadthing/next";
 import { UploadThingError } from "uploadthing/server";
 import { getSession } from "@/lib/auth";
+import { prisma } from "@/lib/prisma";
+import { z } from "zod";
+
 const f = createUploadthing();
 
 async function auth(req: Request) {
@@ -16,18 +19,44 @@ export const ourFileRouter = {
       maxFileCount: 1,
     },
   })
-    .middleware(async ({ req }) => {
+    .input(z.object({ productId: z.string() }))
+    .middleware(async ({ req, input }) => {
       const user = await auth(req);
-
       if (!user) throw new UploadThingError("Unauthorized");
 
-      return { userId: user.id };
+      const product = await prisma.product.findUnique({
+        where: { product_id: input.productId },
+      });
+
+      if (!product) throw new UploadThingError("Produto não encontrado");
+
+      return {
+        userId: user.id,
+        productId: input.productId, 
+      };
     })
     .onUploadComplete(async ({ metadata, file }) => {
       console.log("Upload complete for userId:", metadata.userId);
-      console.log("file url", file.ufsUrl);
+      console.log("file url", file.url);
 
-      return { uploadedBy: metadata.userId };
+      try {
+        const productImage = await prisma.productImage.create({
+          data: {
+            product_id: metadata.productId,
+            url: file.url,
+          },
+        });
+
+        console.log("Imagem salva no banco:", productImage);
+
+        return {
+          uploadedBy: metadata.userId,
+          imageId: productImage.image_id,
+          productId: metadata.productId,
+        };
+      } catch (error) {
+        throw new UploadThingError("Erro ao salvar imagem no banco");
+      }
     }),
 } satisfies FileRouter;
 

@@ -32,5 +32,22 @@ export default function ProductPage() {
     );
   }
 
-  return <div>{product.name}</div>;
+  return (
+    <div>
+      <p>{product.product_id}</p>
+      <h1 className="text-2xl font-bold mb-4">{product.name}</h1>
+      <p>Categoria: {product.Category.name}</p>
+      <div className="flex">
+        {product.ProductImage.map((image, index) => (
+          <img
+            key={index}
+            src={image.url}
+            alt={product.name}
+            className="w-fit h-64 object-cover mb-4"
+          />
+        ))}
+      </div>
+      <h2 className="text-3xl">R${product.price}</h2>
+    </div>
+  );
 }
