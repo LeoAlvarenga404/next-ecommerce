@@ -1,13 +1,22 @@
 "use client";
 
 import { Card } from "@/components/ui/card";
+import { useAuth } from "@/contexts/auth-context";
 import { useState } from "react";
 
 export default function CheckoutPage() {
   const [loading, setLoading] = useState(false);
+  const { isAuthenticated } = useAuth();
 
   const handleCheckout = async () => {
     setLoading(true);
+
+    if (!isAuthenticated) {
+      alert("Precisa ta logado");
+      setLoading(false);
+
+      return;
+    }
     try {
       const response = await fetch("/api/checkout", {
         method: "POST",

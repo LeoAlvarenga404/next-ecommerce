@@ -47,7 +47,7 @@ model Product {
   description String?
   stock       Int
 
-  sku String? @unique  
+  sku         String      @unique
   OrderItem   OrderItem[]
   CartItem    CartItem[]
   category_id String?
@@ -55,18 +55,58 @@ model Product {
   created_at DateTime @default(now())
   updated_at DateTime @updatedAt
 
-  Category     Category?      @relation("CategoryProducts", fields: [category_id], references: [category_id])
-  ProductImage ProductImage[]
+  Category              Category?               @relation("CategoryProducts", fields: [category_id], references: [category_id])
+  ProductImage          ProductImage[]
+  ProductAttributeValue ProductAttributeValue[]
 }
 
 model ProductImage {
-  image_id   String @id @default(uuid())
+  image_id   String  @id @default(uuid())
   product_id String
   url        String
-
-  product Product @relation(fields: [product_id], references: [product_id])
+  primary    Boolean @default(false)
+  product    Product @relation(fields: [product_id], references: [product_id])
 
   @@unique([product_id, url], name: "unique_product_image")
+}
+
+model ProductAttribute {
+  attribute_id          String                  @id @default(uuid())
+  name                  String
+  unit                  String?
+  type                  String
+  categories            CategoryAttribute[]
+  ProductAttributeValue ProductAttributeValue[]
+}
+
+model ProductAttributeValue {
+  value_id     String @id @default(uuid())
+  product_id   String
+  attribute_id String
+  value        String
+
+  product   Product          @relation(fields: [product_id], references: [product_id])
+  attribute ProductAttribute @relation(fields: [attribute_id], references: [attribute_id])
+
+  @@unique([product_id, attribute_id])
+}
+
+model CategoryAttribute {
+  id           String @id @default(uuid())
+  category_id  String
+  attribute_id String
+
+  category  Category         @relation(fields: [category_id], references: [category_id])
+  attribute ProductAttribute @relation(fields: [attribute_id], references: [attribute_id])
+
+  @@unique([category_id, attribute_id])
+}
+
+model Category {
+  category_id       String              @id @default(uuid())
+  name              String              @unique
+  products          Product[]           @relation("CategoryProducts")
+  CategoryAttribute CategoryAttribute[]
 }
 
 model Order {
@@ -85,7 +125,6 @@ model Order {
 
   user      User        @relation(fields: [user_id], references: [user_id])
   OrderItem OrderItem[]
-  Payment   Payment[]
 }
 
 enum OrderStatus {
@@ -131,12 +170,6 @@ model CartItem {
   product Product @relation(fields: [product_id], references: [product_id])
 }
 
-model Category {
-  category_id String    @id @default(uuid())
-  name        String    @unique
-  products    Product[] @relation("CategoryProducts")
-}
-
 model UserAddress {
   address_id String @id @default(uuid())
   user_id    String
@@ -148,20 +181,4 @@ model UserAddress {
   user User @relation(fields: [user_id], references: [user_id])
 
   @@unique([user_id, street, city, state, zip_code], name: "unique_user_address")
-}
-
-enum PaymentStatus {
-  PENDING
-  COMPLETED
-  FAILED
-}
-
-model Payment {
-  payment_id String        @id @default(uuid())
-  order_id   String
-  amount     Float
-  status     PaymentStatus
-  created_at DateTime      @default(now())
-
-  order Order @relation(fields: [order_id], references: [order_id])
 }
