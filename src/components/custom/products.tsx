@@ -7,6 +7,7 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { AddToCart } from "./add-to-cart";
 import Image from "next/image";
+import { ProductImage } from "./image";
 
 export function Products() {
   const { data, isLoading, error } = useProducts();
@@ -32,11 +33,9 @@ export function Products() {
       {data?.products.map((product) => (
         <Card key={product.product_id} className="p-4">
           <b className="text-gray-600">{product.name}</b>
-          <img
+          <ProductImage
             src={product.ProductImage[0].url}
             alt={product.name}
-
-            className="w-full h-48 object-cover mb-4"
           />
           <p className="text-gray-700">Preço: R$ {product.price.toFixed(2)}</p>
           <div className="flex justify-between items-center mt-4">

@@ -1,6 +1,8 @@
 "use client";
 
+import { ProductImage } from "@/components/custom/image";
 import { useProduct } from "@/hooks/use-products";
+import Image from "next/image";
 import { useParams } from "next/navigation";
 
 export default function ProductPage() {
@@ -34,16 +36,14 @@ export default function ProductPage() {
 
   return (
     <div>
-      <p>{product.product_id}</p>
       <h1 className="text-2xl font-bold mb-4">{product.name}</h1>
       <p>Categoria: {product.Category.name}</p>
       <div className="flex">
         {product.ProductImage.map((image, index) => (
-          <img
+          <ProductImage
             key={index}
             src={image.url}
-            alt={product.name}
-            className="w-fit h-64 object-cover mb-4"
+            alt={`${product.name} - ${index + 1}`}
           />
         ))}
       </div>

@@ -2,11 +2,13 @@
 
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import { useAuth } from "@/contexts/auth-context";
 import { useCart } from "@/hooks/use-cart";
 import Link from "next/link";
 
 export default function CartPage() {
   const { cart } = useCart();
+
   return (
     <div className="flex gap-4 w-full p-4">
       <div className="w-full">
