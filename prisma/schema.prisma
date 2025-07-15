@@ -23,6 +23,7 @@ model User {
   Cart         Cart?
   UserAddress  UserAddress[]
   RefreshToken RefreshToken[]
+  Review       Review[]
 }
 
 enum UserRole {
@@ -58,6 +59,7 @@ model Product {
   Category              Category?               @relation("CategoryProducts", fields: [category_id], references: [category_id])
   ProductImage          ProductImage[]
   ProductAttributeValue ProductAttributeValue[]
+  Review                Review[]
 }
 
 model ProductImage {
@@ -115,16 +117,22 @@ model Order {
 
   total                    Float
   status                   OrderStatus @default(PENDING)
-  shipping_address         String?
+  shipping_address_id      String?
   tracking_code            String?
   stripe_session_id        String?     @unique
   stripe_payment_intent_id String?     @unique
 
   created_at DateTime @default(now())
   updated_at DateTime @updatedAt
+  couponCode String?
 
-  user      User        @relation(fields: [user_id], references: [user_id])
-  OrderItem OrderItem[]
+  user             User            @relation(fields: [user_id], references: [user_id])
+  OrderItem        OrderItem[]
+  Coupon           Coupon?         @relation(fields: [couponCode], references: [code])
+  ShippingMethod   ShippingMethod? @relation(fields: [shippingMethodId], references: [id])
+  shipping_address UserAddress?    @relation(fields: [shipping_address_id], references: [address_id])
+
+  shippingMethodId String?
 }
 
 enum OrderStatus {
@@ -178,7 +186,38 @@ model UserAddress {
   state      String
   zip_code   String
 
-  user User @relation(fields: [user_id], references: [user_id])
+  user  User    @relation(fields: [user_id], references: [user_id])
+  Order Order[]
 
   @@unique([user_id, street, city, state, zip_code], name: "unique_user_address")
+}
+
+model Coupon {
+  code       String   @id
+  discount   Float
+  expires_at DateTime
+  Order      Order[]
+}
+
+model Review {
+  id         String   @id @default(uuid())
+  user_id    String
+  product_id String
+  rating     Int
+  comment    String?
+  created_at DateTime @default(now())
+
+  user    User    @relation(fields: [user_id], references: [user_id])
+  product Product @relation(fields: [product_id], references: [product_id])
+
+  @@unique([user_id, product_id], name: "unique_user_product_review")
+
+}
+
+model ShippingMethod {
+  id             String  @id @default(uuid())
+  name           String
+  price          Float
+  estimated_days Int
+  Order          Order[]
 }

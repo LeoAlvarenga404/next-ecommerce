@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { AddToCart } from "./add-to-cart";
 import Image from "next/image";
 import { ProductImage } from "./image";
+import { AddToWishlist } from "./add-to-wishlist";
 
 export function Products() {
   const { data, isLoading, error } = useProducts();
@@ -32,11 +33,11 @@ export function Products() {
     <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 p-8 max-w-6xl mx-auto">
       {data?.products.map((product) => (
         <Card key={product.product_id} className="p-4">
-          <b className="text-gray-600">{product.name}</b>
-          <ProductImage
-            src={product.ProductImage[0].url}
-            alt={product.name}
-          />
+          <div className="flex justify-between items-center mb-2">
+            <b className="text-gray-600">{product.name}</b>
+            <AddToWishlist productId={product.product_id} />
+          </div>
+          <ProductImage src={product.ProductImage[0].url} alt={product.name} />
           <p className="text-gray-700">Preço: R$ {product.price.toFixed(2)}</p>
           <div className="flex justify-between items-center mt-4">
             <Link href={`/product/${product.product_id}`}>

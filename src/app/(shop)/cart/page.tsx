@@ -9,6 +9,8 @@ import Link from "next/link";
 export default function CartPage() {
   const { cart } = useCart();
 
+
+  
   return (
     <div className="flex gap-4 w-full p-4">
       <div className="w-full">

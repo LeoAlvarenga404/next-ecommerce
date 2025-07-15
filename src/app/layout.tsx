@@ -1,9 +1,9 @@
 import type { Metadata } from "next";
 import { DM_Sans, Playfair_Display } from "next/font/google";
 import "./globals.css";
-import { Header } from "@/components/layouts/header";
 import { QueryProvider } from "@/providers/query-provider";
 import { AuthProvider } from "@/contexts/auth-context";
+import { ThemeProvider } from "@/components/layouts/theme-provider";
 
 export const fontSans = DM_Sans({
   subsets: ["latin"],
@@ -21,19 +21,16 @@ export const metadata: Metadata = {
 
 export default function RootLayout({
   children,
-}: Readonly<{
+}: {
   children: React.ReactNode;
-}>) {
+}) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <body
         className={`${fontSans.variable} ${fontSerif.variable} antialiased font-sans`}
       >
         <QueryProvider>
-          <AuthProvider>
-            <Header />
-            {children}
-          </AuthProvider>
+          <AuthProvider>{children}</AuthProvider>
         </QueryProvider>
       </body>
     </html>

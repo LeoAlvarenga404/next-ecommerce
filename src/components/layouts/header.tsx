@@ -8,6 +8,7 @@ import {
   ListOrdered,
   LogOut,
   LogOutIcon,
+  LayoutDashboard,
 } from "lucide-react";
 import { Label } from "@/components/ui/label";
 import Link from "next/link";
@@ -68,6 +69,15 @@ export function Header() {
               <span>Sign In</span>
             </Link>
           )}
+          <div className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors">
+            <LayoutDashboard className="size-5" />
+            <Link
+              href="/admin"
+              className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+            >
+              Dashboard
+            </Link>
+          </div>
         </div>
       </div>
     </header>
