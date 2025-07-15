@@ -24,6 +24,7 @@ model User {
   UserAddress  UserAddress[]
   RefreshToken RefreshToken[]
   Review       Review[]
+  Wishlist     Wishlist?
 }
 
 enum UserRole {
@@ -60,6 +61,7 @@ model Product {
   ProductImage          ProductImage[]
   ProductAttributeValue ProductAttributeValue[]
   Review                Review[]
+  WishlistItem          WishlistItem[]
 }
 
 model ProductImage {
@@ -211,7 +213,6 @@ model Review {
   product Product @relation(fields: [product_id], references: [product_id])
 
   @@unique([user_id, product_id], name: "unique_user_product_review")
-
 }
 
 model ShippingMethod {
@@ -220,4 +221,25 @@ model ShippingMethod {
   price          Float
   estimated_days Int
   Order          Order[]
+}
+
+model Wishlist {
+  id         String   @id @default(uuid())
+  user_id    String   @unique
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  user         User           @relation(fields: [user_id], references: [user_id])
+  WishlistItem WishlistItem[]
+}
+
+model WishlistItem {
+  id          String @id @default(uuid())
+  wishlist_id String
+  product_id  String
+
+  wishlist Wishlist @relation(fields: [wishlist_id], references: [id])
+  product  Product  @relation(fields: [product_id], references: [product_id])
+
+  @@unique([wishlist_id, product_id], name: "unique_wishlist_item")
 }

@@ -82,6 +82,12 @@ export async function POST(request: NextRequest) {
       },
     });
 
+    await prisma.wishlist.create({
+      data: {
+        user_id: user.user_id,
+      },
+    });
+
     await setAuthCookies(accesstoken, refreshToken);
 
     return NextResponse.json(
