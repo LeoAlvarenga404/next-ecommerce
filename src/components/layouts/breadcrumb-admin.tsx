@@ -5,31 +5,31 @@ import {
   BreadcrumbItem,
   BreadcrumbLink,
   BreadcrumbList,
-  BreadcrumbPage,
   BreadcrumbSeparator,
 } from "../ui/breadcrumb";
 import { usePathname } from "next/navigation";
 
 export function BreadcrumbAdmin() {
   const pathname = usePathname();
+  const paths = pathname.split("/").filter((path) => path && path !== "admin");
 
-  const afterAdmin = pathname.replace("/admin", "").split("/").filter(Boolean);
-  let current = afterAdmin[0];
-
-  const pageName = current
-    ? current.charAt(0).toUpperCase() + current.slice(1)
-    : "Overview";
+  if (pathname === "/admin" || pathname === "/admin/") {
+    paths.unshift("Visão Geral");
+  }
 
   return (
     <Breadcrumb>
       <BreadcrumbList>
-        <BreadcrumbItem className="hidden md:block">
-          <BreadcrumbLink href="/admin">Dashboard</BreadcrumbLink>
-        </BreadcrumbItem>
-        <BreadcrumbSeparator className="hidden md:block" />
-        <BreadcrumbItem>
-          <BreadcrumbPage>{pageName}</BreadcrumbPage>
-        </BreadcrumbItem>
+        {paths.map((path, index) => (
+          <div key={index} className="flex items-center">
+            <BreadcrumbItem>
+              <BreadcrumbLink className="capitalize">{path}</BreadcrumbLink>
+            </BreadcrumbItem>
+            {index < paths.length - 1 && (
+              <BreadcrumbSeparator className="hidden md:block" />
+            )}
+          </div>
+        ))}
       </BreadcrumbList>
     </Breadcrumb>
   );

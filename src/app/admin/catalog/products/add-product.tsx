@@ -35,7 +35,7 @@ interface Category {
   name: string;
 }
 
-export default function ProductPage() {
+export default function AddProduct() {
   const { data } = useProducts();
   const [categories, setCategories] = useState<Category[]>([]);
   const [productId, setProductId] = useState("");
@@ -44,7 +44,7 @@ export default function ProductPage() {
   useEffect(() => {
     const fetchCategories = async () => {
       try {
-        const res = await fetch("/api/categories");
+        const res = await fetch("/api/products/categories");
         if (!res.ok) {
           throw new Error("Falha ao buscar categorias");
         }

@@ -1,44 +1,44 @@
 import { useQuery } from "@tanstack/react-query";
 
-interface Product {
+export interface IProductProductImage {
+  url: string;
+  alt_text?: string;
+}
+
+export interface IProductCategory {
+  category_id: string;
+  name: string;
+}
+export interface IProductAttribute {
+  attribute_id: string;
+  name: string;
+  unit?: string;
+  type: string;
+}
+export interface IProductAttributeValue {
+  attribute_id: string;
+  value: string;
+  attribute: IProductAttribute;
+}
+export interface IProduct {
   product_id: string;
   name: string;
   price: number;
   description?: string;
   stock: number;
   sku: string;
-  ProductImage: Array<{
-    url: string;
-    alt_text?: string;
-  }>;
-  Category: {
-    name: string;
-  };
+  Category: IProductCategory;
+  ProductImage: IProductProductImage[];
+  ProductAttributeValue: IProductAttributeValue[];
 }
 
-interface ProductsResponse {
-  products: Product[];
+export interface ProductsResponse {
+  products: IProduct[];
   pagination: {
     page: number;
     limit: number;
     total: number;
     pages: number;
-  };
-}
-
-interface SingleProductResponse {
-  product_id: string;
-  name: string;
-  price: number;
-  description?: string;
-  stock: number;
-  sku: string;
-  ProductImage: Array<{
-    url: string;
-    alt_text?: string;
-  }>;
-  Category: {
-    name: string;
   };
 }
 
@@ -52,9 +52,7 @@ const fetchProducts = async (): Promise<ProductsResponse> => {
   return res.json();
 };
 
-const fetchProduct = async (
-  productId: string
-): Promise<SingleProductResponse> => {
+const fetchProduct = async (productId: string): Promise<IProduct> => {
   const res = await fetch(`/api/products/${productId}`);
 
   if (!res.ok) {

@@ -29,6 +29,17 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    const existingCategory = await prisma.category.findUnique({
+      where: { name },
+    });
+
+    if (existingCategory) {
+      return NextResponse.json(
+        { error: "Categoria já existe" },
+        { status: 409 }
+      );
+    }
+
     const category = await prisma.category.create({
       data: { name },
     });

@@ -19,6 +19,19 @@ export async function GET(
       include: {
         Category: true,
         ProductImage: true,
+        ProductAttributeValue: {
+          select: {
+            attribute_id: true,
+            value: true,
+            attribute: {
+              select: {
+                name: true,
+                unit: true,
+                type: true,
+              },
+            },
+          },
+        },
       },
     });
 

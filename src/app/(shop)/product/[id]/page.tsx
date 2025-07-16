@@ -35,7 +35,7 @@ export default function ProductPage() {
   }
 
   return (
-    <div>
+    <div className="w-[800px] p-5">
       <h1 className="text-2xl font-bold mb-4">{product.name}</h1>
       <p>Categoria: {product.Category.name}</p>
       <div className="flex">
@@ -48,6 +48,15 @@ export default function ProductPage() {
         ))}
       </div>
       <h2 className="text-3xl">R${product.price}</h2>
+      <p>Atributos: </p>
+      <div className="list-disc pl-5 ">
+        {product.ProductAttributeValue.map((attr) => (
+          <p key={attr.attribute_id}>
+            <b>{attr.attribute.name}:</b> {attr.value}
+            {attr.attribute.unit && ` (${attr.attribute.unit})`}
+          </p>
+        ))}
+      </div>
     </div>
   );
 }

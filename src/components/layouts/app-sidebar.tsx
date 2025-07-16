@@ -5,13 +5,15 @@ import { usePathname } from "next/navigation";
 import {
   BarChart3,
   Package,
-  FolderOpen,
   ShoppingCart,
   Users,
-  Upload,
   Settings,
   LayoutDashboard,
+  ChevronRight,
+  Circle,
+  LucideIcon,
 } from "lucide-react";
+
 import {
   Sidebar,
   SidebarHeader,
@@ -21,25 +23,40 @@ import {
   SidebarMenuButton,
   SidebarRail,
   SidebarFooter,
+  SidebarMenuSub,
+  SidebarMenuSubItem,
+  SidebarMenuSubButton,
 } from "@/components/ui/sidebar";
+
 import { Separator } from "@/components/ui/separator";
 import { NavUser } from "./nav-user";
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from "../ui/collapsible";
 
-const sidebarItems = [
+interface ISidebarItem {
+  title: string;
+  icon: LucideIcon;
+  url?: string;
+  subMenu?: ISidebarItem[];
+}
+
+const sidebarItems: ISidebarItem[] = [
   {
-    title: "Dashboard",
+    title: "Visão Geral",
     icon: BarChart3,
     url: "/admin",
   },
   {
-    title: "Products",
+    title: "Catálogo",
     icon: Package,
-    url: "/admin/products",
-  },
-  {
-    title: "Categories",
-    icon: FolderOpen,
-    url: "/admin/categories",
+    subMenu: [
+      { title: "Produtos", url: "/admin/catalog/products", icon: Circle },
+      { title: "Categorias", url: "/admin/catalog/categories", icon: Circle },
+      { title: "Atributos", url: "/admin/catalog/attributes", icon: Circle },
+    ],
   },
   {
     title: "Orders",
@@ -58,7 +75,7 @@ const sidebarItems = [
   },
 ];
 
-export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
+export function AppSidebar(props: React.ComponentProps<typeof Sidebar>) {
   const pathname = usePathname();
 
   return (
@@ -86,13 +103,65 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       <SidebarContent className="gap-0">
         <SidebarMenu>
           {sidebarItems.map((item) => {
-            const isActive = pathname.endsWith(item.url);
+            const isActive = item.url && pathname.startsWith(item.url);
+            const hasSubMenu = item.subMenu && item.subMenu.length > 0;
+            const isSubMenuActive =
+              hasSubMenu &&
+              item.subMenu?.some(
+                (subItem) => subItem.url && pathname.startsWith(subItem.url)
+              );
+
+            if (hasSubMenu) {
+              return (
+                <Collapsible
+                  key={item.title}
+                  asChild
+                  defaultOpen={isSubMenuActive}
+                >
+                  <SidebarMenuItem>
+                    <CollapsibleTrigger asChild>
+                      <SidebarMenuButton isActive={isActive || isSubMenuActive}>
+                        {item.icon && <item.icon size={16} />}
+                        {item.title}
+                        <ChevronRight className="ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90" />
+                      </SidebarMenuButton>
+                    </CollapsibleTrigger>
+                    <CollapsibleContent>
+                      <SidebarMenuSub>
+                        {item.subMenu?.map((subItem) => {
+                          const isSubActive =
+                            subItem.url && pathname.endsWith(subItem.url);
+
+                          return (
+                            <SidebarMenuSubItem
+                              key={subItem.url || subItem.title}
+                            >
+                              <SidebarMenuSubButton
+                                asChild
+                                isActive={!!isSubActive}
+                              >
+                                <a
+                                  href={subItem.url}
+                                  className="flex items-center gap-2"
+                                >
+                                  {subItem.title}
+                                </a>
+                              </SidebarMenuSubButton>
+                            </SidebarMenuSubItem>
+                          );
+                        })}
+                      </SidebarMenuSub>
+                    </CollapsibleContent>
+                  </SidebarMenuItem>
+                </Collapsible>
+              );
+            }
 
             return (
-              <SidebarMenuItem key={item.title}>
-                <SidebarMenuButton asChild isActive={isActive}>
+              <SidebarMenuItem key={item.url || item.title}>
+                <SidebarMenuButton asChild isActive={!!isActive}>
                   <a href={item.url} className="flex items-center gap-2">
-                    <item.icon size={16} />
+                    {item.icon && <item.icon size={12} />}
                     {item.title}
                   </a>
                 </SidebarMenuButton>

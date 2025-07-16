@@ -46,6 +46,7 @@ model Product {
   product_id  String  @id @default(uuid())
   name        String
   price       Float
+  descount    Float? @default(0)
   description String?
   stock       Int
 
@@ -77,10 +78,16 @@ model ProductImage {
 model ProductAttribute {
   attribute_id          String                  @id @default(uuid())
   name                  String
-  unit                  String?
-  type                  String
+  unit                  String? // e.g., "kg", "pcs"
+  type                  ProductAttributeType    @default(STRING)
   categories            CategoryAttribute[]
   ProductAttributeValue ProductAttributeValue[]
+}
+
+enum ProductAttributeType {
+  STRING
+  NUMBER
+  BOOLEAN
 }
 
 model ProductAttributeValue {
