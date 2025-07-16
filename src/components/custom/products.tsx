@@ -37,7 +37,10 @@ export function Products() {
             <b className="text-gray-600">{product.name}</b>
             <AddToWishlist productId={product.product_id} />
           </div>
-          <ProductImage src={product.ProductImage[0].url} alt={product.name} />
+          <ProductImage
+            src={product?.ProductImage[0]?.url}
+            alt={product.name}
+          />
           <p className="text-gray-700">Preço: R$ {product.price.toFixed(2)}</p>
           <div className="flex justify-between items-center mt-4">
             <Link href={`/product/${product.product_id}`}>
