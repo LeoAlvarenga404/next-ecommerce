@@ -52,7 +52,7 @@ export async function POST(request: NextRequest) {
       attributes_id.length === 0
     ) {
       return NextResponse.json(
-        { error: "É necessário inserir a categoria e o atributo" },
+        { error: "É necessário inserir a categoria e pelo menos um atributo" },
         { status: 400 }
       );
     }
@@ -79,8 +79,31 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // Check for existing associations
+    const existingAssociations = await prisma.categoryAttribute.findMany({
+      where: {
+        category_id,
+        attribute_id: { in: attributes_id },
+      },
+    });
+
+    // Filter out already associated attributes
+    const existingAttributeIds = existingAssociations.map(
+      (assoc) => assoc.attribute_id
+    );
+    const newAttributeIds = attributes_id.filter(
+      (id) => !existingAttributeIds.includes(id)
+    );
+
+    if (newAttributeIds.length === 0) {
+      return NextResponse.json(
+        { message: "Todos os atributos já estão associados a esta categoria" },
+        { status: 200 }
+      );
+    }
+
     const categoryAttributes = await prisma.categoryAttribute.createMany({
-      data: attributes_id.map((attribute_id) => ({
+      data: newAttributeIds.map((attribute_id) => ({
         category_id,
         attribute_id,
       })),
@@ -88,12 +111,15 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json(
       {
-        message: "Atributos vinculados à categoria com sucesso",
+        message: `${newAttributeIds.length} atributo(s) vinculado(s) à categoria com sucesso`,
+        associatedCount: newAttributeIds.length,
+        skippedCount: existingAttributeIds.length,
         categoryAttributes,
       },
       { status: 201 }
     );
   } catch (error) {
+    console.error("Error associating attributes to category:", error);
     return NextResponse.json(
       { error: `Erro ao vincular atributo a categoria: ${error}` },
       { status: 500 }
