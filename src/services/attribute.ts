@@ -74,8 +74,11 @@ export const attributeService = {
     }
   },
   async createProductAttributeValue(
-    attributeValue: Omit<IProductAttributeValue, "attribute_id">,
-    productId: string
+    data: {
+      product_id: string;
+      value: string;
+      attribute_id: string;
+    }
   ): Promise<IProductAttributeValue> {
     try {
       const res = await fetch(`/api/attributes/product/`, {
@@ -84,8 +87,9 @@ export const attributeService = {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          product_id: productId,
-          ...attributeValue,
+          product_id: data.product_id,
+          value: data.value,
+          attribute_id: data.attribute_id,
         }),
       });
 

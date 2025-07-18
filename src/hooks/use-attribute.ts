@@ -1,6 +1,9 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { attributeService } from "@/services/attribute";
-import { type IProductAttribute } from "@/@types/product";
+import {
+  IProductAttributeValue,
+  type IProductAttribute,
+} from "@/@types/product";
 
 const STALE_TIME = 5 * 60 * 1000;
 const GC_TIME = 10 * 60 * 1000;
@@ -30,6 +33,23 @@ export function useCreateAttribute() {
   return useMutation({
     mutationFn: (data: Omit<IProductAttribute, "attribute_id">) =>
       attributeService.createAttribute(data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["attributes"] });
+    },
+  });
+}
+
+export function useCreateProductAttributeValue() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (
+      data: {
+        product_id: string;
+        value: string;
+        attribute_id: string;
+      }
+    ) => attributeService.createProductAttributeValue(data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["attributes"] });
     },

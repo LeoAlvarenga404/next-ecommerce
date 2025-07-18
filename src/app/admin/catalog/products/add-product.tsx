@@ -35,7 +35,7 @@ interface Category {
   name: string;
 }
 
-export default function AddProduct() {
+export function AddProduct() {
   const { data } = useProducts();
   const [categories, setCategories] = useState<Category[]>([]);
   const [productId, setProductId] = useState("");
