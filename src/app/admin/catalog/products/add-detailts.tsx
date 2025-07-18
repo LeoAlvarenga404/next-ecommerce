@@ -4,7 +4,7 @@ import {
   useAttributeByCategory,
   useCreateProductAttributeValue,
 } from "@/hooks/use-attribute";
-import { useProducts } from "@/hooks/use-products";
+import { useProducts, useProduct } from "@/hooks/use-products";
 import {
   Select,
   SelectContent,
@@ -14,11 +14,10 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { IProduct } from "@/@types/product";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
-import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { Button } from "@/components/ui/button";
 export function ProductDetails() {
@@ -42,6 +41,7 @@ export function ProductDetails() {
   );
   const { mutate: createProductAttributeValue } =
     useCreateProductAttributeValue();
+  const { data: productData } = useProduct(productSelected.product_id);
 
   const handleProductChange = (productId: string) => {
     const selectedProduct = dataProducts?.products.find(
@@ -49,13 +49,16 @@ export function ProductDetails() {
     );
     if (selectedProduct) {
       setProductSelected(selectedProduct);
+      reset();
     }
   };
-  const { register, handleSubmit } = useForm();
+
+ 
+
+  const { register, handleSubmit, reset } = useForm();
 
   function inputTypeFromAttributeType(type: string) {
-    if (type === "NUMBER") return "number";
-    if (type === "BOOLEAN") return "checkbox";
+
     return "text";
   }
 
@@ -67,6 +70,7 @@ export function ProductDetails() {
     let attributeData: submitProps[] = [];
 
     Object.entries(data.attributes).forEach(([attributeId, value]) => {
+      console.log(`Processando atributo: ${attributeId} = ${value}`);
       attributeData.push({
         attributeId: attributeId,
         value: String(value),
@@ -75,12 +79,15 @@ export function ProductDetails() {
 
     attributeData.forEach((item) => {
       if (!item.value || item.value.trim() === "") return;
+
       createProductAttributeValue({
         product_id: productSelected.product_id,
         attribute_id: item.attributeId,
         value: item.value,
       });
     });
+
+    alert("Atributos salvos com sucesso!");
   };
 
   return (
@@ -106,13 +113,36 @@ export function ProductDetails() {
           className="grid grid-cols-4 gap-4 mt-4"
         >
           {Array.isArray(attributesByCategory?.[0]?.CategoryAttribute) &&
-            attributesByCategory?.[0]?.CategoryAttribute.map((attr) => (
+            attributesByCategory?.[0]?.CategoryAttribute.map((attr, index) => (
               <div key={attr.attribute.attribute_id} className="space-y-4">
                 <Label>{attr.attribute.name}</Label>
                 <Input
                   type={inputTypeFromAttributeType(attr.attribute.type)}
                   placeholder={`Valor para ${attr.attribute.name}`}
-                  {...register(`attributes.${attr.attribute.attribute_id}`)}
+                  {...(attr.attribute.type === "BOOLEAN"
+                    ? {
+                        ...register(
+                          `attributes.${attr.attribute.attribute_id}`,
+                          {
+                            setValueAs: (value) => (value ? "true" : "false"),
+                          }
+                        ),
+                        defaultChecked:
+                          productData?.ProductAttributeValue.find(
+                            (value) =>
+                              value.attribute_id === attr.attribute.attribute_id
+                          )?.value === "true",
+                      }
+                    : {
+                        ...register(
+                          `attributes.${attr.attribute.attribute_id}`
+                        ),
+                        defaultValue:
+                          productData?.ProductAttributeValue.find(
+                            (value) =>
+                              value.attribute_id === attr.attribute.attribute_id
+                          )?.value || "",
+                      })}
                 />
               </div>
             ))}

@@ -30,7 +30,7 @@ export function Products() {
   }
   console.log(JSON.stringify(data));
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 p-8 max-w-6xl mx-auto">
+    <div className="grid grid-cols-3 gap-4 h-auto w-auto">
       {data?.products.map((product) => (
         <Card key={product.product_id} className="p-4">
           <div className="flex justify-between items-center mb-2">

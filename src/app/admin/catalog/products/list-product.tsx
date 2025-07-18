@@ -35,12 +35,8 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import {
-  IProduct,
-  IProductCategory,
-  type ProductsResponse,
-  useProducts,
-} from "@/hooks/use-products";
+import { useProducts } from "@/hooks/use-products";
+import { IProduct, IProductCategory } from "@/@types/product";
 
 export const columns: ColumnDef<IProduct>[] = [
   {
