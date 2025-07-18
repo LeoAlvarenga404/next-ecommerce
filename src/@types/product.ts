@@ -33,6 +33,7 @@ export interface IProduct {
   name: string;
   price: number;
   description?: string;
+  descount?: number;
   stock: number;
   sku: string;
   Category: IProductCategory;
