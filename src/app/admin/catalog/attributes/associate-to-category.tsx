@@ -1,10 +1,9 @@
 "use client";
-// aqui eu vou associar os atributos as categorias
-// posso associar muitos atributos a uma categoria de uma vez, penso em colocar os atributos em checkbox
 
 import {
   useAssociateCategoryAttribute,
   useAttributes,
+  useAttributeByCategory,
 } from "@/hooks/use-attribute";
 import { useCategories } from "@/hooks/use-category";
 import { useState, useMemo } from "react";
@@ -31,6 +30,7 @@ export function AssociateToCategory() {
   const { data: categories, isLoading: isCategoriesLoading } = useCategories();
   const { data: attributes, isLoading: isAttributesLoading } = useAttributes();
   const associateCategoryAttribute = useAssociateCategoryAttribute();
+  const { data: categoryAttributes } = useAttributeByCategory(categoryId);
 
   const filteredAttributes = useMemo(() => {
     if (!attributes) return [];
@@ -38,6 +38,20 @@ export function AssociateToCategory() {
       attribute.name.toLowerCase().includes(searchTerm.toLowerCase())
     );
   }, [attributes, searchTerm]);
+
+  const isAttributeAssociated = (attributeId: string) => {
+    if (!categoryAttributes || categoryAttributes.length === 0) return false;
+
+     const category = categoryAttributes.find(
+      (cat) => cat.category_id === categoryId
+    );
+
+    if (!category || !category.CategoryAttribute) return false;
+
+    return category.CategoryAttribute.some(
+      (catAttr) => catAttr.attribute.attribute_id === attributeId
+    );
+  };
 
   const handleAttributeChange = (attributeId: string, checked: boolean) => {
     if (checked) {
@@ -123,31 +137,44 @@ export function AssociateToCategory() {
                     : "Nenhum atributo disponível"}
                 </p>
               ) : (
-                filteredAttributes.map((attribute) => (
-                  <div
-                    key={attribute.attribute_id}
-                    className="flex items-center space-x-2"
-                  >
-                    <Checkbox
-                      id={`attribute-${attribute.attribute_id}`}
-                      checked={selectedAttributes.includes(
-                        attribute.attribute_id
-                      )}
-                      onCheckedChange={(checked) =>
-                        handleAttributeChange(
-                          attribute.attribute_id,
-                          checked as boolean
-                        )
-                      }
-                    />
-                    <Label
-                      htmlFor={`attribute-${attribute.attribute_id}`}
-                      className="text-sm font-normal cursor-pointer"
+                filteredAttributes.map((attribute) => {
+                  const isAssociated = isAttributeAssociated(
+                    attribute.attribute_id
+                  );
+
+                  return (
+                    <div
+                      key={attribute.attribute_id}
+                      className="flex items-center space-x-2"
                     >
-                      {attribute.name} {attribute.unit && `(${attribute.unit})`}
-                    </Label>
-                  </div>
-                ))
+                      <Checkbox
+                        id={`attribute-${attribute.attribute_id}`}
+                        checked={
+                          !!isAssociated ||
+                          selectedAttributes.includes(attribute.attribute_id)
+                        }
+                        disabled={!!isAssociated}
+                        onCheckedChange={(checked) =>
+                          !isAssociated &&
+                          handleAttributeChange(
+                            attribute.attribute_id,
+                            checked === true
+                          )
+                        }
+                      />
+                      <Label
+                        htmlFor={`attribute-${attribute.attribute_id}`}
+                        className={`text-sm font-normal cursor-pointer ${
+                          isAssociated ? "text-muted-foreground" : ""
+                        }`}
+                      >
+                        {attribute.name}
+                        {attribute.unit && `(${attribute.unit})`}
+                        {!!isAssociated && " (já associado)"}
+                      </Label>
+                    </div>
+                  );
+                })
               )}
             </div>
           </Card>

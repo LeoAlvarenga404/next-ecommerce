@@ -13,6 +13,16 @@ export interface IProductAttribute {
   unit?: string;
   type: string;
 }
+
+export interface IProductCategoryAttribute {
+  category_id: string;
+  name: string;
+  CategoryAttribute: {
+    some(arg0: (attr: any) => boolean): unknown;
+    attribute: IProductAttribute;
+  };
+}
+
 export interface IProductAttributeValue {
   attribute_id: string;
   value: string;

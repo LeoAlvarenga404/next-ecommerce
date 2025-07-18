@@ -13,6 +13,7 @@
 import type {
   IProductAttribute,
   IProductAttributeValue,
+  IProductCategoryAttribute,
 } from "@/@types/product";
 
 export const attributeService = {
@@ -33,7 +34,7 @@ export const attributeService = {
 
   async getAttributeByCategory(
     categoryId: string
-  ): Promise<IProductAttribute[]> {
+  ): Promise<IProductCategoryAttribute[]> {
     try {
       const res = await fetch(
         `/api/attributes/category/?category_id=${categoryId}`

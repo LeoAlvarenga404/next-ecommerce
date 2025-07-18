@@ -19,9 +19,10 @@ export async function GET(request: NextRequest) {
       },
       include: {
         CategoryAttribute: {
-          include: {
+          select: {
             attribute: {
               select: {
+                attribute_id: true,
                 name: true,
                 unit: true,
                 type: true,
