@@ -1,28 +1,37 @@
-import { Star } from "lucide-react";
+import { Heart } from "lucide-react";
 import { useState } from "react";
 
 export function AddToWishlist({ productId }: { productId: string }) {
-  const [wishlist, setWishlist] = useState(false);
+  const [isWishlisted, setIsWishlisted] = useState(false);
+  const [isAnimating, setIsAnimating] = useState(false);
 
-  console.log("add to wishlist", productId);
+  const handleToggleWishlist = () => {
+    setIsAnimating(true);
+    setIsWishlisted(!isWishlisted);
+    
+    // Reset animation after it completes
+    setTimeout(() => setIsAnimating(false), 300);
+    
+    // Here you could add logic to save to localStorage or API
+    console.log("wishlist toggle", productId, !isWishlisted);
+  };
+
   return (
-    <button className="cursor-pointer">
-      {wishlist ? (
-        <Star
-          className="text-amber-500"
-          fill="currentColor"
-          onClick={() => {
-            setWishlist(false);
-          }}
-        />
-      ) : (
-        <Star
-          className="text-gray-600"
-          onClick={() => {
-            setWishlist(true);
-          }}
-        />
-      )}
+    <button 
+      onClick={handleToggleWishlist}
+      className="p-1 hover:bg-gray-100 rounded-full transition-colors group"
+      title={isWishlisted ? "Remover da lista de desejos" : "Adicionar à lista de desejos"}
+    >
+      <Heart 
+        className={`
+          w-5 h-5 transition-all duration-300 transform
+          ${isWishlisted 
+            ? "text-red-500 fill-red-500 scale-110" 
+            : "text-gray-400 hover:text-red-400 group-hover:scale-110"
+          }
+          ${isAnimating ? "animate-pulse scale-125" : ""}
+        `}
+      />
     </button>
   );
 }

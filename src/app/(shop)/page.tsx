@@ -27,12 +27,23 @@ function CategoryList() {
 
 export default function Home() {
   return (
-    <div className="w-full">
+    <div className="w-full min-h-screen bg-gray-50/30">
       <HomeCarousel />
       <CategoryList />
-      <div className="mt-10 flex max-w-7xl justify-center w-full mx-auto gap-4">
-        <ProductFilter />
-        <Products />
+
+      {/* Container principal com filtros e produtos */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="flex flex-col lg:flex-row gap-8">
+          {/* Sidebar com filtros */}
+          <aside className="lg:w-80 flex-shrink-0">
+            <ProductFilter />
+          </aside>
+
+          {/* Área principal de produtos */}
+          <main className="flex-1 min-w-0">
+            <Products />
+          </main>
+        </div>
       </div>
     </div>
   );

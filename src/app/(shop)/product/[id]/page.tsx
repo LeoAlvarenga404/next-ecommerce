@@ -38,13 +38,14 @@ export default function ProductPage() {
     <div className="w-[800px] p-5">
       <h1 className="text-2xl font-bold mb-4">{product.name}</h1>
       <p>Categoria: {product.Category.name}</p>
-      <div className="flex">
+      <div className="flex gap-4">
         {product.ProductImage.map((image, index) => (
-          <ProductImage
-            key={index}
-            src={image.url}
-            alt={`${product.name} - ${index + 1}`}
-          />
+          <div key={index} className="relative w-32 h-32 flex-shrink-0">
+            <ProductImage
+              src={image.url}
+              alt={`${product.name} - ${index + 1}`}
+            />
+          </div>
         ))}
       </div>
       <h2 className="text-3xl">R${product.price}</h2>
