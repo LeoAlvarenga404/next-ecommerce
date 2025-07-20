@@ -1,5 +1,5 @@
 import { Products } from "@/components/custom/products";
-import { ProductFilter } from "../filter";
+import { ProductFilter } from "./filter";
 
 export default function ProductsPage() {
   return (
