@@ -19,7 +19,7 @@ export async function createAccessToken(payload: Omit<JWTPayload, "exp">) {
   return await new SignJWT(payload)
     .setProtectedHeader({ alg: "HS512" })
     .setIssuedAt()
-    .setExpirationTime("15m")
+    .setExpirationTime("30m")
     .sign(secret);
 }
 
@@ -99,7 +99,7 @@ export async function setAuthCookies(
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       sameSite: "strict",
-      maxAge: 30 * 60,
+      maxAge: 30 * 60, 
       path: "/",
     });
   }
@@ -109,7 +109,7 @@ export async function setAuthCookies(
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       sameSite: "strict",
-      maxAge: 7 * 24 * 60 * 60,
+      maxAge: 7 * 24 * 60 * 60, 
       path: "/",
     });
   }

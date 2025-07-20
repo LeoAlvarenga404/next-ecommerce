@@ -191,9 +191,11 @@ model UserAddress {
   address_id String @id @default(uuid())
   user_id    String
   street     String
+  number     String?
   city       String
   state      String
   zip_code   String
+  complement String?
 
   user  User    @relation(fields: [user_id], references: [user_id])
   Order Order[]

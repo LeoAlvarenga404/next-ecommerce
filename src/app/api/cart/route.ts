@@ -14,7 +14,11 @@ export async function GET() {
       include: {
         CartItem: {
           include: {
-            product: true,
+            product: {
+              include: {
+                ProductImage: true,
+              },
+            },
           },
         },
       },

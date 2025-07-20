@@ -7,7 +7,7 @@ import { useState } from "react";
 export function AddToCart({
   productId,
   quantity = 1,
-  variant = "icon"
+  variant = "icon",
 }: {
   productId: string;
   quantity?: number;
@@ -19,12 +19,12 @@ export function AddToCart({
 
   const handleAddItemToCart = async () => {
     setIsAdding(true);
-    
+
     try {
       if (user) {
         addItem({ productId, quantity });
       }
-      
+
       const cart = localStorage.getItem("cart");
 
       if (cart) {
@@ -50,7 +50,7 @@ export function AddToCart({
       }
 
       // Simular um pequeno delay para feedback visual
-      await new Promise(resolve => setTimeout(resolve, 500));
+      await new Promise((resolve) => setTimeout(resolve, 500));
     } finally {
       setIsAdding(false);
     }

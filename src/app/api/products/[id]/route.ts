@@ -8,12 +8,15 @@ export async function GET(
   try {
     const { id } = await params;
 
+    ""
+
     if (!id) {
       return NextResponse.json(
         { error: "ID do produto inválido" },
         { status: 400 }
       );
     }
+    
     const product = await prisma.product.findUnique({
       where: { product_id: id },
       include: {
@@ -22,6 +25,7 @@ export async function GET(
         ProductAttributeValue: {
           select: {
             attribute_id: true,
+            
             value: true,
             attribute: {
               select: {

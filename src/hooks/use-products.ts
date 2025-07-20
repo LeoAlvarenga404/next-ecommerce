@@ -1,5 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import type { IProduct, IProductsResponse } from "@/@types/product";
+import type { IProduct } from "@/@types/product";
 import { productService } from "@/services/product";
 
 export function useProducts() {

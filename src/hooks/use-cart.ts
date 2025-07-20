@@ -36,7 +36,7 @@ const removeFromCart = async (productId: string) => {
 };
 
 export const useCart = () => {
-  const { data: cart, refetch: refetchCart } = useQuery({
+  const { data: cart, refetch: refetchCart, isLoading: isLoadingCart } = useQuery({
     queryKey: ["cart"],
     queryFn: getCart,
   });
@@ -64,6 +64,7 @@ export const useCart = () => {
   return {
     cart,
     addItem,
+    isLoadingCart,
     removeItem,
   };
 };

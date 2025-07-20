@@ -21,6 +21,7 @@ import {
 import { useState } from "react";
 import Link from "next/link";
 import { Label } from "@/components/ui/label";
+import { formatPriceToBrazilianCurrency } from "@/utils/formatter/price";
 
 export default function ProductPage() {
   const { id } = useParams();
@@ -156,7 +157,6 @@ export default function ProductPage() {
                     alt={`${product.name} - ${selectedImageIndex + 1}`}
                   />
 
-                  {/* Navigation Arrows */}
                   {product.ProductImage.length > 1 && (
                     <>
                       <Button
@@ -203,7 +203,7 @@ export default function ProductPage() {
                   >
                     <ProductImage
                       src={image.url}
-                      alt={`${product.name} - ${index + 1}`}
+                      alt={`Imagem ${index + 1} do produto${product.name}`}
                     />
                   </button>
                 ))}
@@ -213,7 +213,6 @@ export default function ProductPage() {
 
           <div className="space-y-6">
             <div>
-     
               <h1 className="text-3xl font-bold text-gray-900 mb-2">
                 {product.name}
               </h1>
@@ -239,12 +238,12 @@ export default function ProductPage() {
             <div className="space-y-3">
               <div className="flex items-baseline gap-3">
                 <span className="text-4xl font-bold text-primary">
-                  R$ {priceWithDiscount.toFixed(2)}
+                  {formatPriceToBrazilianCurrency(priceWithDiscount)}
                 </span>
                 {product.descount && (
                   <>
                     <span className="text-lg text-muted-foreground line-through">
-                      R$ {product?.price}
+                      {formatPriceToBrazilianCurrency(product?.price)}
                     </span>
                     <Badge variant="destructive" className="text-xs">
                       -{product?.descount}%
@@ -253,24 +252,23 @@ export default function ProductPage() {
                 )}
               </div>
 
-              {/* Stock Status */}
               <div className="flex items-center gap-2">
                 <div
                   className={`w-2 h-2 rounded-full ${
                     stockStatus === "high"
-                      ? "bg-green-500"
+                      ? "bg-emerald-500"
                       : stockStatus === "medium"
-                      ? "bg-yellow-500"
-                      : "bg-red-500"
+                      ? "bg-amber-500"
+                      : "bg-rose-500"
                   }`}
                 />
                 <span
                   className={`text-sm font-medium ${
                     stockStatus === "high"
-                      ? "text-green-600"
+                      ? "text-emerald-600"
                       : stockStatus === "medium"
-                      ? "text-yellow-600"
-                      : "text-red-600"
+                      ? "text-amber-600"
+                      : "text-rose-600"
                   }`}
                 >
                   {isInStock
@@ -282,7 +280,6 @@ export default function ProductPage() {
 
             <Separator />
 
-            {/* Quantity and Add to Cart */}
             <div className="space-y-4">
               <div className="flex items-center gap-4">
                 <label className="text-sm font-medium">Quantidade:</label>
@@ -354,8 +351,6 @@ export default function ProductPage() {
             </Card>
           </div>
         )}
-
-        {/* Additional Information */}
         <div className="mt-8 grid grid-cols-1 md:grid-cols-2 gap-6">
           <Card>
             <CardHeader>

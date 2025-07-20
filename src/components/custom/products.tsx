@@ -6,19 +6,19 @@ import {
   useFilteredProducts,
 } from "@/hooks/use-product-filter";
 import { Card } from "@/components/ui/card";
-import { ShoppingCart } from "lucide-react";
+import { ShoppingCart, Star } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { AddToCart } from "./add-to-cart";
-import Image from "next/image";
 import { ProductImage } from "./image";
 import { AddToWishlist } from "./add-to-wishlist";
 import { IProduct } from "@/@types/product";
+import { formatPriceToBrazilianCurrency } from "@/utils/formatter/price";
+import { Badge } from "../ui/badge";
 
 export function Products() {
   const { filters } = useProductFilter();
 
-  // Use filtered products if there are active filters, otherwise use all products
   const hasFilters = Object.keys(filters).length > 0;
   const {
     data: allProducts,
@@ -31,7 +31,6 @@ export function Products() {
     error: filteredError,
   } = useFilteredProducts(filters);
 
-  // Choose which data to use based on whether filters are active
   const data = hasFilters ? filteredData : allProducts;
   const isLoading = hasFilters ? filteredLoading : allLoading;
   const error = hasFilters ? filteredError : allError;
@@ -65,7 +64,7 @@ export function Products() {
   }
 
   return (
-    <div className="w-full max-w-6xl mx-auto">
+    <div className="w-full mx-auto">
       <div className="flex items-center justify-between mb-6">
         <div>
           <h2 className="text-2xl font-bold text-gray-900">
@@ -85,65 +84,92 @@ export function Products() {
         )}
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-        {products.map((product: IProduct) => (
-          <Card
-            key={product.product_id}
-            className="group hover:shadow-lg transition-all duration-300 border-0 shadow-sm bg-white rounded-xl overflow-hidden p-0"
-          >
-            <div className="relative aspect-square overflow-hidden bg-gray-50">
-              <ProductImage
-                src={product?.ProductImage[0]?.url}
-                alt={product.name}
-              />
-              <div className="absolute top-3 right-3 z-10">
-                <div className="bg-white/90 backdrop-blur-sm rounded-full p-0 flex items-center justify-center hover:bg-white transition-colors">
-                  <AddToWishlist productId={product.product_id} />
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6">
+        {products.map((product: IProduct) => {
+          const valueWithDescount =
+            product.price - (product.price * (product.descount || 0)) / 100;
+
+          return (
+            <Card
+              key={product.product_id}
+              className="group hover:shadow-lg transition-all duration-300 border-0 shadow-sm bg-white rounded-xl overflow-hidden p-0"
+            >
+              <div className="relative aspect-square overflow-hidden bg-gray-50">
+                <ProductImage
+                  src={product?.ProductImage[0]?.url}
+                  alt={product.name}
+                />
+                <div className="absolute top-3 right-3 z-10">
+                  <div className="bg-white/90 backdrop-blur-sm rounded-full p-0 flex items-center justify-center hover:bg-white transition-colors">
+                    <AddToWishlist productId={product.product_id} />
+                  </div>
                 </div>
               </div>
-            </div>
-            <div className="p-4 space-y-3">
-              <div className="space-y-1">
-                <h3 className="font-semibold text-gray-900 text-sm leading-tight line-clamp-2 min-h-[2rem]">
-                  {product.name}
-                </h3>
+              <div className="p-4 space-y-3">
+                <div className="space-y-1">
+                  <h3 className="font-semibold text-gray-900 text-sm leading-tight line-clamp-2 min-h-[2rem]">
+                    {product.name}
+                  </h3>
 
-                <p className="text-xs text-gray-500 uppercase tracking-wide">
-                  {product.Category?.name || "Categoria"}
-                </p>
-              </div>
-              <div className="space-y-1">
-                <div className="flex items-baseline gap-2">
-                  <span className="text-lg font-bold text-gray-900">
-                    R$ {product.price.toFixed(2)}
-                  </span>
+                  <p className="text-xs text-gray-500 uppercase tracking-wide">
+                    {product.Category?.name || "Categoria"}
+                  </p>
                 </div>
-              </div>
+                <div className="space-y-1">
+                  <div className="flex items-baseline gap-2">
+                    <div className="flex flex-col w-full">
+                      <div className="flex items-center gap-2">
+                        <span className="text-sm text-muted-foreground line-through">
+                          {formatPriceToBrazilianCurrency(product.price)}
+                        </span>
+                        <Badge className="bg-red-500">
+                          %{product.descount}
+                        </Badge>
+                      </div>
+                      <div className="flex justify-between items-center">
+                        <span className="text-lg font-bold text-gray-900 w-full">
+                          {formatPriceToBrazilianCurrency(valueWithDescount)}
+                        </span>
+                        <div className="flex">
+                          {Array.from({ length: 5 }).map((_, index) => (
+                            <div key={index}>
+                              <Star
+                              size={12}
+                              className="fill-amber-500 text-amber-500"
+                              />
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
 
-              <div className="flex gap-2 pt-2">
-                <Link
-                  href={`/product/${product.product_id}`}
-                  className="flex-1"
-                >
-                  <Button
-                    variant="outline"
-                    className="w-full text-sm h-9 hover:bg-primary hover:text-primary-foreground transition-colors"
+                <div className="flex gap-2 pt-2">
+                  <Link
+                    href={`/product/${product.product_id}`}
+                    className="flex-1"
                   >
-                    Ver Detalhes
-                  </Button>
-                </Link>
+                    <Button
+                      variant="outline"
+                      className="w-full text-sm h-9 hover:bg-primary hover:text-primary-foreground transition-colors"
+                    >
+                      Ver Detalhes
+                    </Button>
+                  </Link>
 
-                <div className="flex items-center">
-                  <AddToCart
-                    productId={product.product_id}
-                    quantity={1}
-                    variant="icon"
-                  />
+                  <div className="flex items-center">
+                    <AddToCart
+                      productId={product.product_id}
+                      quantity={1}
+                      variant="icon"
+                    />
+                  </div>
                 </div>
               </div>
-            </div>
-          </Card>
-        ))}
+            </Card>
+          );
+        })}
       </div>
 
       {products.length === 0 && (

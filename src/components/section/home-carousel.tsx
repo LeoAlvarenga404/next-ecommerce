@@ -2,6 +2,7 @@
 
 import React from "react";
 import { useCallback, useEffect, useState } from "react";
+import Image from "next/image";
 import {
   Carousel,
   CarouselContent,
@@ -13,27 +14,18 @@ import { cn } from "@/lib/utils";
 const carouselData = [
   {
     id: 1,
-    title: "Novos Lançamentos",
-    subtitle: "Descubra os tênis mais esperados",
-    image: "/api/placeholder/800/400",
-    cta: "Comprar Agora",
-    bgGradient: "from-blue-600 to-purple-700",
+    image: "/banner-headphone.webp",
+    alt: "Banner 1",
   },
   {
     id: 2,
-    title: "Promoção Relâmpago",
-    subtitle: "Até 50% OFF em sneakers selecionados",
-    image: "/api/placeholder/800/400",
-    cta: "Ver Ofertas",
-    bgGradient: "from-red-500 to-orange-600",
+    image: "/banner2.webp",
+    alt: "Banner 2",
   },
   {
     id: 3,
-    title: "Coleção Streetwear",
-    subtitle: "Para quem tem estilo próprio",
-    image: "/api/placeholder/800/400",
-    cta: "Explorar",
-    bgGradient: "from-green-500 to-teal-600",
+    image: "/banner3.webp",
+    alt: "Banner 3",
   },
 ];
 
@@ -74,16 +66,19 @@ export function HomeCarousel() {
           }}
         >
           <CarouselContent>
-            {carouselData.map((item, index) => (
+            {carouselData.map((item) => (
               <CarouselItem key={item.id}>
                 <div className="relative overflow-hidden">
-                  <div
-                    className={cn(
-                      "relative h-[30rem] bg-gradient-to-r flex items-center justify-center",
-                      item.bgGradient
-                    )}
-                  >
-                    <h1 className="text-9xl text-white">{index + 1}</h1>
+                  <div className="relative w-full aspect-[2160/600]">
+                    <Image
+                      src={item.image}
+                      alt={item.alt}
+                      fill
+                      quality={100}
+                      className="object-cover"
+                      priority={item.id === 1}
+                      sizes="100vw"
+                    />
                   </div>
                 </div>
               </CarouselItem>
