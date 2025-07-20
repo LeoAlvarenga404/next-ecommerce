@@ -30,23 +30,31 @@ export default function CartPage() {
     setIsUpdating(itemId);
     await new Promise((resolve) => setTimeout(resolve, 500));
 
-    console.log("Updating quantity:", itemId, newQuantity);
-
     setIsUpdating(null);
   };
 
   const removeItem = async (itemId: string) => {
     setIsUpdating(itemId);
     await new Promise((resolve) => setTimeout(resolve, 500));
-    console.log("Removing item:", itemId);
 
     setIsUpdating(null);
   };
 
+  function calculateValueWithDiscount(price: number, discount: number) {
+    return price - (price * discount) / 100;
+  }
+
   const calculateSubtotal = () => {
     if (!cart?.CartItem) return 0;
     return cart.CartItem.reduce((sum: number, item: any) => {
-      return sum + item.product.price * item.quantity;
+      return (
+        sum +
+        calculateValueWithDiscount(
+          item.product.price,
+          item.product.discount || 0
+        ) *
+          item.quantity
+      );
     }, 0);
   };
 
@@ -116,111 +124,119 @@ export default function CartPage() {
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           <div className="lg:col-span-2 space-y-4">
-            {cart.CartItem.map((item: any) => (
-              <Card key={item.cart_item_id} className="overflow-hidden">
-                <CardContent className="p-6">
-                  <div className="flex gap-4">
-                    <div className="w-24 h-24 bg-gray-100 rounded-lg overflow-hidden flex-shrink-0">
-                      {item.product.ProductImage?.[0] ? (
-                        <ProductImage
-                          src={item.product.ProductImage[0].url}
-                          alt={item.product.name}
-                        />
-                      ) : (
-                        <div className="w-full h-full flex items-center justify-center">
-                          <Package className="w-8 h-8 text-gray-400" />
-                        </div>
-                      )}
-                    </div>
+            {cart.CartItem.map((item: any) => {
+              const valueWithDiscount =
+                item.product.price -
+                (item.product.price * (item.product.discount || 0)) / 100;
 
-                    <div className="flex-1 min-w-0">
-                      <div className="flex justify-between items-start mb-2">
-                        <div>
-                          <h3 className="font-semibold text-lg leading-tight">
-                            {item.product.name}
-                          </h3>
-                          <p className="text-sm text-muted-foreground">
-                            SKU: {item.product.sku}
-                          </p>
-                        </div>
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          onClick={() => removeItem(item.cart_item_id)}
-                          disabled={isUpdating === item.cart_item_id}
-                          className="text-red-500 hover:text-red-700 hover:bg-red-50"
-                        >
-                          {isUpdating === item.cart_item_id ? (
-                            <div className="w-4 h-4 border-2 border-red-500 border-t-transparent rounded-full animate-spin" />
-                          ) : (
-                            <Trash2 className="w-4 h-4" />
-                          )}
-                        </Button>
+              return (
+                <Card key={item.cart_item_id} className="overflow-hidden">
+                  <CardContent className="p-6">
+                    <div className="flex gap-4">
+                      <div className="w-24 h-24 bg-gray-100 rounded-lg overflow-hidden flex-shrink-0">
+                        {item.product.ProductImage?.[0] ? (
+                          <ProductImage
+                            src={item.product.ProductImage[0].url}
+                            alt={item.product.name}
+                          />
+                        ) : (
+                          <div className="w-full h-full flex items-center justify-center">
+                            <Package className="w-8 h-8 text-gray-400" />
+                          </div>
+                        )}
                       </div>
 
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-2">
+                      <div className="flex-1 min-w-0">
+                        <div className="flex justify-between items-start mb-2">
+                          <div>
+                            <h3 className="font-semibold text-lg leading-tight">
+                              {item.product.name}
+                            </h3>
+                            <p className="text-sm text-muted-foreground">
+                              SKU: {item.product.sku}
+                            </p>
+                          </div>
                           <Button
-                            variant="outline"
+                            variant="ghost"
                             size="icon"
-                            className="h-8 w-8"
-                            onClick={() =>
-                              updateQuantity(
-                                item.cart_item_id,
-                                item.quantity - 1
-                              )
-                            }
-                            disabled={
-                              item.quantity <= 1 ||
-                              isUpdating === item.cart_item_id
-                            }
-                          >
-                            <Minus className="w-3 h-3" />
-                          </Button>
-                          <span className="w-12 text-center font-medium">
-                            {item.quantity}
-                          </span>
-                          <Button
-                            variant="outline"
-                            size="icon"
-                            className="h-8 w-8"
-                            onClick={() =>
-                              updateQuantity(
-                                item.cart_item_id,
-                                item.quantity + 1
-                              )
-                            }
+                            onClick={() => removeItem(item.cart_item_id)}
                             disabled={isUpdating === item.cart_item_id}
+                            className="text-red-500 hover:text-red-700 hover:bg-red-50"
                           >
-                            <Plus className="w-3 h-3" />
+                            {isUpdating === item.cart_item_id ? (
+                              <div className="w-4 h-4 border-2 border-red-500 border-t-transparent rounded-full animate-spin" />
+                            ) : (
+                              <Trash2 className="w-4 h-4" />
+                            )}
                           </Button>
                         </div>
 
-                        <div className="text-right">
-                          <p className="text-sm text-muted-foreground">
-                            {formatPriceToBrazilianCurrency(item.product.price)}{" "}
-                            cada
-                          </p>
-                          <p className="text-lg font-bold">
-                            {formatPriceToBrazilianCurrency(
-                              item.product.price * item.quantity
-                            )}
-                          </p>
-                        </div>
-                      </div>
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-2">
+                            <Button
+                              variant="outline"
+                              size="icon"
+                              className="h-8 w-8"
+                              onClick={() =>
+                                updateQuantity(
+                                  item.cart_item_id,
+                                  item.quantity - 1
+                                )
+                              }
+                              disabled={
+                                item.quantity <= 1 ||
+                                isUpdating === item.cart_item_id
+                              }
+                            >
+                              <Minus className="w-3 h-3" />
+                            </Button>
+                            <span className="w-12 text-center font-medium">
+                              {item.quantity}
+                            </span>
+                            <Button
+                              variant="outline"
+                              size="icon"
+                              className="h-8 w-8"
+                              onClick={() =>
+                                updateQuantity(
+                                  item.cart_item_id,
+                                  item.quantity + 1
+                                )
+                              }
+                              disabled={isUpdating === item.cart_item_id}
+                            >
+                              <Plus className="w-3 h-3" />
+                            </Button>
+                          </div>
 
-                      {item.product.stock <= 5 && (
-                        <div className="mt-3">
-                          <Badge variant="destructive" className="text-xs">
-                            Apenas {item.product.stock} em estoque
-                          </Badge>
+                          <div className="text-right">
+                            <p className="text-sm text-muted-foreground">
+                              {formatPriceToBrazilianCurrency(
+                                valueWithDiscount
+                              )}{" "}
+                              cada
+                            </p>
+                            <p className="text-lg font-bold">
+                              {formatPriceToBrazilianCurrency(
+                                valueWithDiscount * item.quantity
+                              )}
+                            </p>
+                          </div>
                         </div>
-                      )}
+
+                        {item.product.stock <= 5 && (
+                          <div className="mt-3">
+                            <Badge variant="destructive" className="text-xs">
+                              Apenas {item.product.stock} em estoque
+                            </Badge>
+                          </div>
+                        )}
+                      </div>
                     </div>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
+                  </CardContent>
+                </Card>
+              );
+            })}
           </div>
 
           <div className="lg:col-span-1">

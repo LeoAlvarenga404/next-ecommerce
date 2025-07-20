@@ -36,42 +36,40 @@ export async function GET(request: NextRequest) {
     const category = filters.category;
 
     const skip = (page - 1) * limit;
-    const where = category ? { category_id: category } : {};
+    const where: any = {
+      ...(filters.category && { category_id: filters.category }),
+      ...(filters.brand && { brand: filters.brand }),
+      ...(filters.search && {
+        name: {
+          contains: filters.search,
+          mode: "insensitive",
+        },
+      }),
+      price: {
+        ...(filters.minPrice !== undefined && { gte: filters.minPrice }),
+        ...(filters.maxPrice !== undefined && { lte: filters.maxPrice }),
+      },
+      ...(filters.inStock !== undefined && {
+        stock: filters.inStock ? { gt: 0 } : 0,
+      }),
+    };
+
+    const orderBy =
+      filters.sortBy === "price"
+        ? { price: filters.sortOrder || "asc" }
+        : filters.sortBy === "name"
+        ? { name: filters.sortOrder || "asc" }
+        : filters.sortBy === "newest"
+        ? { createdAt: "desc" }
+        : undefined;
 
     const products = await prisma.product.findMany({
-      where: {
-        category_id: where.category_id,
-        name: filters.search
-          ? {
-              contains: filters.search,
-              mode: "insensitive",
-            }
-          : undefined,
-        price: {
-          gte: filters.minPrice || 0,
-          lte: filters.maxPrice || 100000,
-        },
-        stock: filters.inStock ? { gt: 0 } : undefined,
-      },
-      orderBy: {
-        price: filters.sortBy === "price" ? filters.sortOrder || "asc" : undefined,
-      },
+      where,
+      orderBy,
       skip,
       take: limit,
       include: {
-        Category: {
-          where: {
-            CategoryAttribute: {
-              every: {
-                attribute: {
-                  name: {
-                    in: ["Marca"],
-                  },
-                },
-              },
-            },
-          },
-        },
+        Category: true,
         ProductImage: true,
       },
     });

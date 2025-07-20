@@ -110,11 +110,9 @@ export default function CheckoutPage() {
         }
       } else {
         console.error("Erro no checkout:", responseData.error);
-        alert("Erro ao processar checkout: " + responseData.error);
       }
     } catch (error) {
       console.error("Erro:", error);
-      alert("Erro ao processar checkout");
     } finally {
       setLoading(false);
     }

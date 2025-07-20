@@ -33,8 +33,14 @@ export async function POST(request: NextRequest) {
     }
 
     const totalAmount = cart.CartItem.reduce((sum, item) => {
-      return sum + item.product.price * item.quantity;
+      return (
+        sum +
+        (item.product.price -
+          item.product.price * ((item.product?.discount || 0) / 100 || 0)) *
+          item.quantity
+      );
     }, 0);
+
     let shippingAddress = await prisma.userAddress.findFirst({
       where: {
         user_id: session.user_id,
@@ -73,7 +79,8 @@ export async function POST(request: NextRequest) {
         order_id: order.order_id,
         product_id: item.product_id,
         quantity: item.quantity,
-        unit_price: item.product.price,
+        unit_price:
+          item.product.price * (1 - (item.product.discount || 0) / 100) * 100,
       })),
     });
 
@@ -85,8 +92,7 @@ export async function POST(request: NextRequest) {
           description: item.product.description || undefined,
         },
         unit_amount: Math.round(
-          item.product.price -
-            item.product.price * ((item.product?.discount || 0) / 100 || 0)
+          item.product.price * (1 - (item.product.discount || 0) / 100) * 100
         ),
       },
       quantity: item.quantity,
@@ -119,7 +125,7 @@ export async function POST(request: NextRequest) {
       orderId: order.order_id,
     });
   } catch (error) {
-    console.error("Erro ao processar o checkout:", error);
+    console.error("Erro ao processar o checkout :", error);
     return NextResponse.json(
       { error: "Erro ao processar o checkout", details: error },
       { status: 500 }
