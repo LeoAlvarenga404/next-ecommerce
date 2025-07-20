@@ -84,7 +84,7 @@ export async function POST(request: NextRequest) {
           name: item.product.name,
           description: item.product.description || undefined,
         },
-        unit_amount: Math.round(item.product.price * 100),
+        unit_amount: Math.round(item.product.price - item.product.price * ((item.product?.descount || 0) / 100 || 0)),
       },
       quantity: item.quantity,
     }));

@@ -19,12 +19,12 @@ const carouselData = [
   },
   {
     id: 2,
-    image: "/banner2.webp",
+    image: "/banner-headphone.webp",
     alt: "Banner 2",
   },
   {
     id: 3,
-    image: "/banner3.webp",
+    image: "/banner-headphone.webp",
     alt: "Banner 3",
   },
 ];

@@ -84,7 +84,7 @@ export function Products() {
         )}
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
         {products.map((product: IProduct) => {
           const valueWithDescount =
             product.price - (product.price * (product.descount || 0)) / 100;
@@ -100,9 +100,7 @@ export function Products() {
                   alt={product.name}
                 />
                 <div className="absolute top-3 right-3 z-10">
-                  <div className="bg-white/90 backdrop-blur-sm rounded-full p-0 flex items-center justify-center hover:bg-white transition-colors">
-                    <AddToWishlist productId={product.product_id} />
-                  </div>
+                  <AddToWishlist productId={product.product_id} />
                 </div>
               </div>
               <div className="p-4 space-y-3">
@@ -122,24 +120,16 @@ export function Products() {
                         <span className="text-sm text-muted-foreground line-through">
                           {formatPriceToBrazilianCurrency(product.price)}
                         </span>
-                        <Badge className="bg-red-500">
-                          %{product.descount}
-                        </Badge>
+                        {product.descount && product.descount > 0 && (
+                          <Badge className="bg-red-500">
+                            %{product.descount}
+                          </Badge>
+                        )}
                       </div>
                       <div className="flex justify-between items-center">
                         <span className="text-lg font-bold text-gray-900 w-full">
                           {formatPriceToBrazilianCurrency(valueWithDescount)}
                         </span>
-                        <div className="flex">
-                          {Array.from({ length: 5 }).map((_, index) => (
-                            <div key={index}>
-                              <Star
-                              size={12}
-                              className="fill-amber-500 text-amber-500"
-                              />
-                            </div>
-                          ))}
-                        </div>
                       </div>
                     </div>
                   </div>

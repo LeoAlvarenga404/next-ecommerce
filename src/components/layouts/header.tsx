@@ -19,7 +19,7 @@ export function Header() {
 
   return (
     <header className="w-full bg-background border-b border-border">
-      <div className="w-full max-w-6xl mx-auto flex items-center justify-between px-4 py-3">
+      <div className="w-full max-w-[1440px] mx-auto flex items-center justify-between px-4 py-3">
         <Link href="/" className="flex items-center gap-2">
           <Image src={"/logo.svg"} alt="Logo" width={100} height={50} />
         </Link>
@@ -30,7 +30,11 @@ export function Header() {
           >
             <Search size={16} className="text-muted-foreground" />
           </Label>
-          <Input id="search" placeholder="Search..." className="pl-9" />
+          <Input
+            id="search"
+            placeholder="Busque por pedidos..."
+            className="pl-9"
+          />
         </div>
 
         <div className="flex gap-4 items-center">

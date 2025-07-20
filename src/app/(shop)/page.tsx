@@ -8,7 +8,7 @@ export default function Home() {
   return (
     <div className="w-full min-h-screen">
       <HomeCarousel />
-      <div className="w-full mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div className="w-full max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="flex flex-col lg:flex-row gap-8 px-12">
           <aside className="lg:w-80 flex-shrink-0">
             <ProductFilter />

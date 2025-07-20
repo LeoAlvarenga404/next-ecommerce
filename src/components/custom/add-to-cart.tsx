@@ -49,7 +49,6 @@ export function AddToCart({
         );
       }
 
-      // Simular um pequeno delay para feedback visual
       await new Promise((resolve) => setTimeout(resolve, 500));
     } finally {
       setIsAdding(false);
