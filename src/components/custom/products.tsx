@@ -25,6 +25,7 @@ export function Products() {
     isLoading: allLoading,
     error: allError,
   } = useProducts();
+
   const {
     data: filteredData,
     isLoading: filteredLoading,
@@ -86,8 +87,8 @@ export function Products() {
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
         {products.map((product: IProduct) => {
-          const valueWithDescount =
-            product.price - (product.price * (product.descount || 0)) / 100;
+          const valueWithDiscount =
+            product.price - (product.price * (product.discount || 0)) / 100;
 
           return (
             <Card
@@ -116,19 +117,19 @@ export function Products() {
                 <div className="space-y-1">
                   <div className="flex items-baseline gap-2">
                     <div className="flex flex-col w-full">
-                      <div className="flex items-center gap-2">
-                        <span className="text-sm text-muted-foreground line-through">
-                          {formatPriceToBrazilianCurrency(product.price)}
-                        </span>
-                        {product.descount && product.descount > 0 && (
+                      {(product.discount || 0) > 0 && (
+                        <div className="flex items-center gap-2">
+                          <span className="text-sm text-muted-foreground line-through">
+                            {formatPriceToBrazilianCurrency(product.price)}
+                          </span>
                           <Badge className="bg-red-500">
-                            %{product.descount}
+                            %{product.discount}
                           </Badge>
-                        )}
-                      </div>
+                        </div>
+                      )}
                       <div className="flex justify-between items-center">
                         <span className="text-lg font-bold text-gray-900 w-full">
-                          {formatPriceToBrazilianCurrency(valueWithDescount)}
+                          {formatPriceToBrazilianCurrency(valueWithDiscount)}
                         </span>
                       </div>
                     </div>

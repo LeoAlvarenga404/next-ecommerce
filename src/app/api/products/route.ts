@@ -1,22 +1,77 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { ProductFilters } from "@/hooks/use-product-filter";
+
+interface SeachParams extends ProductFilters {
+  page: string;
+  limit: string;
+}
 
 export async function GET(request: NextRequest) {
   try {
-    const { searchParams } = new URL(request.url);
-    const page = parseInt(searchParams.get("page") || "1");
-    const limit = parseInt(searchParams.get("limit") || "10");
-    const category = searchParams.get("category");
+    const { searchParams } = request.nextUrl;
+    const filters: SeachParams = {
+      page: searchParams.get("page") || "1",
+      limit: searchParams.get("limit") || "10",
+      category: searchParams.get("category") || undefined,
+      brand: searchParams.get("brand") || undefined,
+      search: searchParams.get("search") || undefined,
+      inStock: searchParams.get("inStock") === "true" || undefined,
+      minPrice: searchParams.get("minPrice")
+        ? parseFloat(searchParams.get("minPrice") as string)
+        : undefined,
+      maxPrice: searchParams.get("maxPrice")
+        ? parseFloat(searchParams.get("maxPrice") as string)
+        : undefined,
+      sortBy: searchParams.get("sortBy") as
+        | "name"
+        | "price"
+        | "newest"
+        | undefined,
+      sortOrder: searchParams.get("sortOrder") as "asc" | "desc" | undefined,
+    };
+
+    const page = parseInt(filters.page);
+    const limit = parseInt(filters.limit);
+    const category = filters.category;
 
     const skip = (page - 1) * limit;
     const where = category ? { category_id: category } : {};
 
     const products = await prisma.product.findMany({
-      where,
+      where: {
+        category_id: where.category_id,
+        name: filters.search
+          ? {
+              contains: filters.search,
+              mode: "insensitive",
+            }
+          : undefined,
+        price: {
+          gte: filters.minPrice || 0,
+          lte: filters.maxPrice || 100000,
+        },
+        stock: filters.inStock ? { gt: 0 } : undefined,
+      },
+      orderBy: {
+        price: filters.sortBy === "price" ? filters.sortOrder || "asc" : undefined,
+      },
       skip,
       take: limit,
       include: {
-        Category: true,
+        Category: {
+          where: {
+            CategoryAttribute: {
+              every: {
+                attribute: {
+                  name: {
+                    in: ["Marca"],
+                  },
+                },
+              },
+            },
+          },
+        },
         ProductImage: true,
       },
     });

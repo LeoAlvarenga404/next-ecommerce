@@ -46,7 +46,7 @@ model Product {
   product_id  String  @id @default(uuid())
   name        String
   price       Float
-  descount    Float? @default(0)
+  discount    Float? @default(0)
   description String?
   stock       Int
 

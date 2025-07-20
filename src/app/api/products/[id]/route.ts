@@ -8,8 +8,6 @@ export async function GET(
   try {
     const { id } = await params;
 
-    ""
-
     if (!id) {
       return NextResponse.json(
         { error: "ID do produto inválido" },

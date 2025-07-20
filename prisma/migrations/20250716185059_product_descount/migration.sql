@@ -15,7 +15,7 @@ ADD COLUMN     "shippingMethodId" TEXT,
 ADD COLUMN     "shipping_address_id" TEXT;
 
 -- AlterTable
-ALTER TABLE "Product" ADD COLUMN     "descount" DOUBLE PRECISION DEFAULT 0;
+ALTER TABLE "Product" ADD COLUMN     "discount" DOUBLE PRECISION DEFAULT 0;
 
 -- AlterTable
 ALTER TABLE "ProductAttribute" DROP COLUMN "type",

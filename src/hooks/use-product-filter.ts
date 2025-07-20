@@ -80,6 +80,7 @@ export function useProductFilter(): UseProductFilterReturn {
 
 export function useFilteredProducts(filters: ProductFilters) {
   const buildQueryString = (filters: ProductFilters) => {
+    
     const params = new URLSearchParams();
 
     if (filters.category) params.append("category", filters.category);

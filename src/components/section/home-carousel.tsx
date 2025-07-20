@@ -95,7 +95,7 @@ export function HomeCarousel() {
             className={cn(
               "transition-all duration-300",
               current === index + 1
-                ? "w-8 h-3 bg-primary rounded-full"
+                ? "w-8 h-3 bg-accent rounded-full"
                 : "w-3 h-3 bg-primary-foreground hover:bg-gray-400 rounded-full"
             )}
             aria-label={`Ir para slide ${index + 1}`}

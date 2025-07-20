@@ -120,7 +120,7 @@ export default function ProductPage() {
   const stockStatus =
     product.stock <= 5 ? "low" : product.stock <= 15 ? "medium" : "high";
   const priceWithDiscount =
-    product.price - product.price * ((product?.descount || 0) / 100 || 0);
+    product.price - product.price * ((product?.discount || 0) / 100 || 0);
 
   return (
     <div className="min-h-screen bg-gray-50/30">
@@ -240,13 +240,13 @@ export default function ProductPage() {
                 <span className="text-4xl font-bold text-primary">
                   {formatPriceToBrazilianCurrency(priceWithDiscount)}
                 </span>
-                {product.descount && (
+                {product.discount && (
                   <>
                     <span className="text-lg text-muted-foreground line-through">
                       {formatPriceToBrazilianCurrency(product?.price)}
                     </span>
                     <Badge variant="destructive" className="text-xs">
-                      -{product?.descount}%
+                      -{product?.discount}%
                     </Badge>
                   </>
                 )}
