@@ -4,13 +4,13 @@ import { getSession } from "@/lib/auth";
 
 export async function GET() {
   try {
-    const session = await getSession();
+    const { session } = await getSession();
     if (!session) {
       return NextResponse.json({ error: "Não autorizado" }, { status: 401 });
     }
 
     const cart = await prisma.cart.findUnique({
-      where: { user_id: session.user_id },
+      where: { user_id: session?.user_id },
       include: {
         CartItem: {
           include: {
@@ -26,7 +26,7 @@ export async function GET() {
 
     if (!cart) {
       const newCart = await prisma.cart.create({
-        data: { user_id: session.user_id },
+        data: { user_id: session?.user_id },
         include: {
           CartItem: {
             include: {
@@ -49,7 +49,7 @@ export async function GET() {
 
 export async function POST(request: NextRequest) {
   try {
-    const session = await getSession();
+    const { session } = await getSession();
     if (!session) {
       return NextResponse.json({ error: "Não autorizado" }, { status: 401 });
     }
@@ -81,12 +81,12 @@ export async function POST(request: NextRequest) {
     }
 
     let cart = await prisma.cart.findUnique({
-      where: { user_id: session.user_id },
+      where: { user_id: session?.user_id },
     });
 
     if (!cart) {
       cart = await prisma.cart.create({
-        data: { user_id: session.user_id },
+        data: { user_id: session?.user_id },
       });
     }
 

@@ -10,9 +10,18 @@ import {
 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-
 export function HeaderClient({ session }: { session: any }) {
-  const isAuthenticated = !!session;
+  const user = session?.session;
+  const handleLogout = async () => {
+    await fetch('/api/auth/logout', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    }).then(() => {
+      window.location.href = '/';
+    })
+  };
 
   return (
     <header className="w-full bg-background border-b border-border sticky top-0 z-98">
@@ -36,7 +45,7 @@ export function HeaderClient({ session }: { session: any }) {
               <span>Cart</span>
             </Link>
 
-            {isAuthenticated && (
+            {user && (
               <Link
                 href="/orders"
                 className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors"
@@ -45,15 +54,16 @@ export function HeaderClient({ session }: { session: any }) {
                 <span>Orders</span>
               </Link>
             )}
-            {isAuthenticated ? (
+            {user && (
               <div
-                onClick={() => "logout"}
+                onClick={handleLogout}
                 className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
               >
                 <LogOutIcon className="size-5" />
                 <span>Logout</span>
               </div>
-            ) : (
+            )}
+            {!user && (
               <Link
                 href="/login"
                 className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors"
@@ -62,7 +72,7 @@ export function HeaderClient({ session }: { session: any }) {
                 <span>Sign In</span>
               </Link>
             )}
-            {session?.role === "ADMIN" && (
+            {user && user.role === "ADMIN" && (
               <div className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors">
                 <LayoutDashboard className="size-5" />
                 <Link
