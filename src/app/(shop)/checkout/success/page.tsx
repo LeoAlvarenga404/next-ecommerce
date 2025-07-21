@@ -10,6 +10,7 @@ import Link from "next/link";
 import { CheckCircle, Package, ArrowRight, Download } from "lucide-react";
 import { IOrder } from "@/@types/order";
 import FeedbackCard from "@/components/custom/feedback-card";
+import { formatPriceToBrazilianCurrency } from "@/utils/formatter/price";
 
 export default function SuccessPage() {
   const searchParams = useSearchParams();
@@ -152,10 +153,7 @@ export default function SuccessPage() {
                     <div className="flex justify-between items-center">
                       <span className="text-muted-foreground">Total:</span>
                       <span className="text-2xl font-bold">
-                        R${" "}
-                        {order.total.toLocaleString("pt-BR", {
-                          minimumFractionDigits: 2,
-                        })}
+                        {formatPriceToBrazilianCurrency(order.total)}
                       </span>
                     </div>
                   </div>

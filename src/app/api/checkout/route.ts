@@ -3,15 +3,15 @@ import { prisma } from "@/lib/prisma";
 import { stripe } from "@/lib/stripe";
 import { getSession } from "@/lib/auth";
 import { checkoutSchema } from "@/schemas/checkout";
-import { calculateValueWithDiscount } from "@/utils/value-with-discount";
 
 export async function POST(request: NextRequest) {
   try {
-    const session = await getSession();
+    const { session } = await getSession();
 
     if (!session) {
       return NextResponse.json({ error: "Não autorizado" }, { status: 401 });
     }
+
     const data = await request.json();
     const parsedBody = checkoutSchema.safeParse(data);
     if (!parsedBody.success) {
@@ -33,14 +33,26 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Carrinho vazio" }, { status: 400 });
     }
 
+    const calculateItemPrice = (price: number, discount: number = 0) => {
+      return price * (1 - discount / 100);
+    };
+
+    const calculateItemTotal = (
+      price: number,
+      discount: number = 0,
+      quantity: number
+    ) => {
+      return calculateItemPrice(price, discount) * quantity;
+    };
+
     const totalAmount = cart.CartItem.reduce((sum, item) => {
       return (
         sum +
-        calculateValueWithDiscount(
+        calculateItemTotal(
           item.product.price,
-          item.product?.discount || 0
-        ) *
+          item.product?.discount || 0,
           item.quantity
+        )
       );
     }, 0);
 
@@ -78,28 +90,41 @@ export async function POST(request: NextRequest) {
     });
 
     await prisma.orderItem.createMany({
-      data: cart.CartItem.map((item) => ({
-        order_id: order.order_id,
-        product_id: item.product_id,
-        quantity: item.quantity,
-        unit_price:
-          item.product.price * (1 - (item.product.discount || 0) / 100) * 100,
-      })),
+      data: cart.CartItem.map((item) => {
+        const unitPriceInReais = calculateItemPrice(
+          item.product.price,
+          item.product.discount || 0
+        );
+
+        return {
+          order_id: order.order_id,
+          product_id: item.product_id,
+          quantity: item.quantity,
+          unit_price: unitPriceInReais,
+        };
+      }),
     });
 
-    const lineItems = cart.CartItem.map((item) => ({
-      price_data: {
-        currency: "brl",
-        product_data: {
-          name: item.product.name,
-          description: item.product.description || undefined,
+    const lineItems = cart.CartItem.map((item) => {
+      const unitPriceInReais = calculateItemPrice(
+        item.product.price,
+        item.product.discount || 0
+      );
+
+      const unitAmountInCents = Math.round(unitPriceInReais * 100);
+
+      return {
+        price_data: {
+          currency: "brl",
+          product_data: {
+            name: item.product.name,
+            description: item.product.description || undefined,
+          },
+          unit_amount: unitAmountInCents,
         },
-        unit_amount: Math.round(
-          item.product.price * (1 - (item.product.discount || 0) / 100) * 100
-        ),
-      },
-      quantity: item.quantity,
-    }));
+        quantity: item.quantity,
+      };
+    });
 
     const stripeSession = await stripe.checkout.sessions.create({
       payment_method_types: ["card"],
@@ -129,9 +154,10 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({
       sessionId: stripeSession.id,
       orderId: order.order_id,
+      url: stripeSession.url,
     });
   } catch (error) {
-    console.error("Erro ao processar o checkout :", error);
+    console.error("Erro ao processar o checkout:", error);
     return NextResponse.json(
       { error: "Erro ao processar o checkout", details: error },
       { status: 500 }

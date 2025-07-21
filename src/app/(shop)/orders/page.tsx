@@ -14,17 +14,8 @@ import { Separator } from "@/components/ui/separator";
 import { Package, MapPin, Calendar, CreditCard, Truck } from "lucide-react";
 import Image from "next/image";
 import { IOrder } from "@/@types/order";
+import { formatPriceToBrazilianCurrency } from "@/utils/formatter/price";
 
-// enum OrderStatus {
-//   PAID
-//   FAILED
-//   PENDING
-//   CONFIRMED
-//   PROCESSING
-//   SHIPPED
-//   DELIVERED
-//   CANCELLED
-// }
 const getStatusVariant = (status: string) => {
   switch (status) {
     case "PAID":
@@ -60,13 +51,6 @@ const getStatusLabel = (status: string) => {
     CANCELLED: "Cancelado",
   };
   return statusMap[status] || status;
-};
-
-const formatCurrency = (value: number) => {
-  return new Intl.NumberFormat("pt-BR", {
-    style: "currency",
-    currency: "BRL",
-  }).format(value / 100);
 };
 
 const formatDate = (dateString: string) => {
@@ -132,7 +116,7 @@ export default function OrdersPage() {
                       {getStatusLabel(order.status)}
                     </Badge>
                     <div className="text-lg font-semibold">
-                      {formatCurrency(order.total)}
+                      {formatPriceToBrazilianCurrency(order.total)}
                     </div>
                   </div>
                 </div>
@@ -174,7 +158,7 @@ export default function OrdersPage() {
                         </div>
                         <div className="text-right">
                           <p className="font-medium">
-                            {formatCurrency(item.unit_price)}
+                            {formatPriceToBrazilianCurrency(item.unit_price)}
                           </p>
                           <p className="text-sm text-muted-foreground">
                             por unidade
@@ -243,7 +227,6 @@ export default function OrdersPage() {
               {order.status !== "PAID" && order.status !== "FAILED" && (
                 <CardFooter className="flex justify-end">
                   <Button
-          
                     onClick={() => NavigateToPaymentLink(order.url_payment)}
                   >
                     Continuar Pagamento
