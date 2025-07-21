@@ -102,7 +102,13 @@ export function useFilteredProducts(filters: ProductFilters) {
     if (debouncedFilters.maxPrice !== undefined)
       params.append("maxPrice", debouncedFilters.maxPrice.toString());
     if (debouncedFilters.search)
-      params.append("search", debouncedFilters.search);
+      params.append(
+        "search",
+        debouncedFilters.search
+          .split(" ")
+          .map((word) => `%${word}%`)
+          .join("")
+      );
     if (debouncedFilters.brand) params.append("brand", debouncedFilters.brand);
     if (debouncedFilters.inStock !== undefined)
       params.append("inStock", debouncedFilters.inStock.toString());

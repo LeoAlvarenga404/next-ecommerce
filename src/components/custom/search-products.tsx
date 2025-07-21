@@ -36,12 +36,12 @@ export function SearchProducts() {
       </Label>
       <Input
         id="search"
-        placeholder="Busque por pedidos..."
+        placeholder="Busque por produtos..."
         className="pl-9"
         value={search}
         onChange={(e) => setSearch(e.target.value)}
       />
-      {search.length > 0 && (
+      {data && search.length > 0 && (
         <Card className="absolute gap-1 w-full z-99">
           {isLoading && (
             <div className="flex justify-center items-center p-4">

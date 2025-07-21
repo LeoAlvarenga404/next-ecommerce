@@ -46,7 +46,7 @@ model Product {
   product_id  String  @id @default(uuid())
   name        String
   price       Float
-  discount    Float? @default(0)
+  discount    Float?  @default(0)
   description String?
   stock       Int
 
@@ -130,6 +130,7 @@ model Order {
   tracking_code            String?
   stripe_session_id        String?     @unique
   stripe_payment_intent_id String?     @unique
+  url_payment              String?     @unique
 
   created_at DateTime @default(now())
   updated_at DateTime @updatedAt
@@ -188,7 +189,7 @@ model CartItem {
 }
 
 model UserAddress {
-  address_id String @id @default(uuid())
+  address_id String  @id @default(uuid())
   user_id    String
   street     String
   number     String?

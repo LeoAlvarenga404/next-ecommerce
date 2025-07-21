@@ -3,6 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { stripe } from "@/lib/stripe";
 import { getSession } from "@/lib/auth";
 import { checkoutSchema } from "@/schemas/checkout";
+import { calculateValueWithDiscount } from "@/utils/value-with-discount";
 
 export async function POST(request: NextRequest) {
   try {
@@ -35,8 +36,10 @@ export async function POST(request: NextRequest) {
     const totalAmount = cart.CartItem.reduce((sum, item) => {
       return (
         sum +
-        (item.product.price -
-          item.product.price * ((item.product?.discount || 0) / 100 || 0)) *
+        calculateValueWithDiscount(
+          item.product.price,
+          item.product?.discount || 0
+        ) *
           item.quantity
       );
     }, 0);
@@ -117,7 +120,10 @@ export async function POST(request: NextRequest) {
 
     await prisma.order.update({
       where: { order_id: order.order_id },
-      data: { stripe_session_id: stripeSession.id },
+      data: {
+        stripe_session_id: stripeSession.id,
+        url_payment: stripeSession.url,
+      },
     });
 
     return NextResponse.json({

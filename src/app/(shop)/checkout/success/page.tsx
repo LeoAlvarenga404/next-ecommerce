@@ -8,25 +8,13 @@ import { useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { CheckCircle, Package, ArrowRight, Download } from "lucide-react";
-
-interface Order {
-  order_id: string;
-  total: number;
-  status: string;
-  created_at: string;
-  OrderItem: Array<{
-    quantity: number;
-    unit_price: number;
-    product: {
-      name: string;
-    };
-  }>;
-}
+import { IOrder } from "@/@types/order";
+import FeedbackCard from "@/components/custom/feedback-card";
 
 export default function SuccessPage() {
   const searchParams = useSearchParams();
   const sessionId = searchParams.get("session_id");
-  const [order, setOrder] = useState<Order | null>(null);
+  const [order, setOrder] = useState<IOrder | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -45,6 +33,11 @@ export default function SuccessPage() {
         body: JSON.stringify({ sessionId }),
       });
 
+      if (response.status === 404) {
+        setOrder(null);
+        return;
+      }
+
       if (response.ok) {
         const orderData = await response.json();
         setOrder(orderData);
@@ -55,6 +48,19 @@ export default function SuccessPage() {
       setLoading(false);
     }
   };
+
+  if (!order && !loading) {
+    return (
+      <FeedbackCard
+        icon={Package}
+        title="Erro"
+        message="Não foi possível encontrar o pedido associado a esta sessão."
+        href="/"
+        buttonText="Voltar para a Loja"
+        bgColor="bg-red-100"
+      />
+    );
+  }
 
   if (!sessionId) {
     return (
