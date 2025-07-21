@@ -1,32 +1,18 @@
 "use client";
 
-import { Input } from "@/components/ui/input";
+import { SearchProducts } from "../../custom/search-products";
 import {
-  NavigationMenu,
-  NavigationMenuContent,
-  NavigationMenuIndicator,
-  NavigationMenuItem,
-  NavigationMenuLink,
-  NavigationMenuList,
-  NavigationMenuTrigger,
-  NavigationMenuViewport,
-} from "@/components/ui/navigation-menu";
-import {
-  ShoppingCart,
-  User,
-  Search,
-  ListOrdered,
-  LogOut,
   LogOutIcon,
   LayoutDashboard,
+  ListOrdered,
+  ShoppingCart,
+  User,
 } from "lucide-react";
-import { Label } from "@/components/ui/label";
-import Link from "next/link";
-import { useAuth } from "@/contexts/auth-context";
 import Image from "next/image";
-import { SearchProducts } from "../custom/search-products";
-export function Header() {
-  const { isAuthenticated, logout, isLoading, user } = useAuth();
+import Link from "next/link";
+
+export function HeaderClient({ session }: { session: any }) {
+  const isAuthenticated = !!session;
 
   return (
     <header className="w-full bg-background border-b border-border sticky top-0 z-98">
@@ -61,7 +47,7 @@ export function Header() {
             )}
             {isAuthenticated ? (
               <div
-                onClick={logout}
+                onClick={() => "logout"}
                 className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
               >
                 <LogOutIcon className="size-5" />
@@ -76,7 +62,7 @@ export function Header() {
                 <span>Sign In</span>
               </Link>
             )}
-            {user?.role === "ADMIN" && (
+            {session?.role === "ADMIN" && (
               <div className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors">
                 <LayoutDashboard className="size-5" />
                 <Link

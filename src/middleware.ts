@@ -1,33 +1,31 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
-
-import { getSession } from "@/lib/auth";
+import { jwtVerify } from "jose";
 
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
+
+  const accessToken = request.cookies.get("access_token")?.value;
+
   if (pathname.startsWith("/admin")) {
+    if (!accessToken) {
+      return NextResponse.redirect(new URL("/", request.url));
+    }
+
     try {
-      const session = await getSession();
-      console.log("sessão", session);
-      if (!session || session.role !== "ADMIN") {
+      const secret = new TextEncoder().encode(process.env.JWT_SECRET);
+      const { payload } = await jwtVerify(accessToken, secret);
+
+      if (payload.role !== "ADMIN") {
         return NextResponse.redirect(new URL("/", request.url));
       }
     } catch (err) {
-      console.error("Erro ao validar sessão no middleware:", err);
+      console.error("Token inválido no middleware:", err);
       return NextResponse.redirect(new URL("/", request.url));
     }
   }
-  if (pathname.startsWith("/checkout")) {
-    try {
-      const session = await getSession();
-      if (!session || !session.user_id) {
-        return NextResponse.redirect(new URL("/login", request.url));
-      }
-    } catch (err) {
-      console.error("Erro ao validar sessão no middleware:", err);
-      return NextResponse.redirect(new URL("/login", request.url));
-    }
-  }
+
+
   return NextResponse.next();
 }
 

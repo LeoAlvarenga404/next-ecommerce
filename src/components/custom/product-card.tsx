@@ -46,7 +46,9 @@ export function ProductCard({ product }: { product: IProduct }) {
                   <span className="text-sm text-muted-foreground line-through">
                     {formatPriceToBrazilianCurrency(product.price)}
                   </span>
-                  <Badge className="bg-red-500">%{product.discount}</Badge>
+                  <Badge className="bg-red-500 text-white">
+                    %{product.discount}
+                  </Badge>
                 </div>
                 <span className="text-lg font-bold text-gray-900">
                   {formatPriceToBrazilianCurrency(price)}

@@ -1,6 +1,12 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { verifyToken, createAccessToken, setAuthCookies, clearAuthCookies } from "@/lib/auth";
+import {
+  verifyToken,
+  createAccessToken,
+  setAuthCookies,
+  clearAuthCookies,
+  createRefreshToken,
+} from "@/lib/auth";
 import { cookies } from "next/headers";
 
 export async function POST() {
@@ -15,7 +21,7 @@ export async function POST() {
       );
     }
 
-     const tokenRecord = await prisma.refreshToken.findUnique({
+    const tokenRecord = await prisma.refreshToken.findUnique({
       where: { token: refreshToken },
       include: { user: true },
     });
@@ -60,7 +66,25 @@ export async function POST() {
       role: tokenRecord.user.role,
     });
 
-    await setAuthCookies(newAccessToken, refreshToken);
+    const newRefreshToken = await createRefreshToken({
+      user_id: tokenRecord.user.user_id,
+      email: tokenRecord.user.email,
+      role: tokenRecord.user.role,
+    });
+
+    await prisma.refreshToken.deleteMany({
+      where: { user_id: tokenRecord.user.user_id },
+    });
+
+    await prisma.refreshToken.create({
+      data: {
+        token: newRefreshToken,
+        user_id: tokenRecord.user.user_id,
+        expires_at: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
+      },
+    });
+
+    await setAuthCookies(newAccessToken, newRefreshToken);
 
     return NextResponse.json({
       message: "Token renovado com sucesso",

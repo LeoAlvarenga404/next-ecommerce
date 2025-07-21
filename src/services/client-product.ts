@@ -1,6 +1,6 @@
 import type { IProduct, IProductsResponse } from "@/@types/product";
 
-export const productService = {
+export const clientProductService = {
   async getProducts(): Promise<IProductsResponse> {
     try {
       const res = await fetch("/api/products");
@@ -29,7 +29,9 @@ export const productService = {
       throw error;
     }
   },
-  async createProduct(product: Omit<IProduct, "product_id">): Promise<IProduct> {
+  async createProduct(
+    product: Omit<IProduct, "product_id">
+  ): Promise<IProduct> {
     try {
       const res = await fetch("/api/products", {
         method: "POST",

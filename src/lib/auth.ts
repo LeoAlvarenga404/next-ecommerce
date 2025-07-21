@@ -43,19 +43,16 @@ export async function verifyToken(token: string) {
 export async function getSession() {
   const cookieStore = await cookies();
   const accessToken = cookieStore.get("access_token")?.value;
+  const refreshToken = cookieStore.get("refresh_token")?.value;
 
-  if (!accessToken) return null;
+  if (!accessToken && !refreshToken) return {session: null};
 
-  try {
-    const payload = await verifyToken(accessToken);
-    return payload;
+ try {
+    const payload = await verifyToken(accessToken || "");
+
+    return { session: payload };
   } catch (error) {
-    console.error("Access token inválido, tentando renovar:", error);
-    const refreshToken = cookieStore.get("refresh_token")?.value;
-
-    if (!refreshToken) {
-      return null;
-    }
+    if (!refreshToken) return { session: null };
 
     try {
       const tokenRecord = await prisma.refreshToken.findUnique({
@@ -65,7 +62,7 @@ export async function getSession() {
 
       if (!tokenRecord || tokenRecord.expires_at < new Date()) {
         await clearAuthCookies();
-        return null;
+        return { session: null };
       }
 
       await verifyToken(refreshToken);
@@ -76,14 +73,38 @@ export async function getSession() {
         role: tokenRecord.user.role,
       });
 
-      await setAuthCookies(newAccessToken, refreshToken);
+      const newRefreshToken = await createRefreshToken({
+        user_id: tokenRecord.user.user_id,
+        email: tokenRecord.user.email,
+        role: tokenRecord.user.role,
+      });
 
-      const newPayload = await verifyToken(newAccessToken);
-      return newPayload;
+      await prisma.refreshToken.delete({
+        where: { token: refreshToken },
+      });
+
+      await prisma.refreshToken.create({
+        data: {
+          user_id: tokenRecord.user.user_id,
+          token: newRefreshToken,
+          expires_at: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
+        },
+      });
+
+      return {
+        session: {
+          user_id: tokenRecord.user.user_id,
+          email: tokenRecord.user.email,
+          role: tokenRecord.user.role,
+        },
+        newTokens: {
+          accessToken: newAccessToken,
+          refreshToken: newRefreshToken,
+        },
+      };
     } catch (refreshError) {
-      console.error("Erro durante renovação do token:", refreshError);
       await clearAuthCookies();
-      return null;
+      return { session: null };
     }
   }
 }
@@ -99,7 +120,7 @@ export async function setAuthCookies(
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       sameSite: "strict",
-      maxAge: 30 * 60, 
+      maxAge: 30 * 60,
       path: "/",
     });
   }
@@ -109,7 +130,7 @@ export async function setAuthCookies(
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       sameSite: "strict",
-      maxAge: 7 * 24 * 60 * 60, 
+      maxAge: 7 * 24 * 60 * 60,
       path: "/",
     });
   }

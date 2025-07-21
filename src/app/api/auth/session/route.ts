@@ -4,7 +4,7 @@ import { prisma } from "@/lib/prisma";
 
 export async function GET() {
   try {
-    const session = await getSession();
+    const { session, newTokens } = await getSession();
 
     if (!session) {
       return NextResponse.json({ error: "Não autenticado" }, { status: 401 });
@@ -27,7 +27,27 @@ export async function GET() {
       );
     }
 
-    return NextResponse.json({ user });
+    const response = NextResponse.json({ user });
+
+    if (newTokens) {
+      response.cookies.set("access_token", newTokens.accessToken, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "strict",
+        maxAge: 30 * 60,
+        path: "/",
+      });
+
+      response.cookies.set("refresh_token", newTokens.refreshToken, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "strict",
+        maxAge: 7 * 24 * 60 * 60,
+        path: "/",
+      });
+    }
+
+    return response;
   } catch (error) {
     console.error("Erro ao verificar sessão:", error);
     return NextResponse.json(

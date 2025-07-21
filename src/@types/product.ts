@@ -32,13 +32,13 @@ export interface IProduct {
   product_id: string;
   name: string;
   price: number;
-  description?: string;
-  discount?: number;
+  description?: string | null;
+  discount?: number | null;
   stock: number;
   sku: string;
-  Category: IProductCategory;
-  ProductImage: IProductProductImage[];
-  ProductAttributeValue: IProductAttributeValue[];
+  Category: IProductCategory | null;
+  ProductImage: IProductProductImage[]
+  ProductAttributeValue: IProductAttributeValue[]
 }
 
 export interface IProductsResponse {

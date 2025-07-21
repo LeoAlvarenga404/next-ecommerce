@@ -1,7 +1,8 @@
 import { ThemeProvider } from "@/components/layouts/theme-provider";
-import { Header } from "@/components/layouts/header";
 import "../globals.css";
 import { Footer } from "@/components/layouts/footer";
+import { HeaderClient } from "@/components/layouts/header/header-client";
+import { HeaderServer } from "@/components/layouts/header/header-server";
 
 export default function ShopLayout({
   children,
@@ -17,7 +18,7 @@ export default function ShopLayout({
       disableTransitionOnChange
     >
       <div className="flex flex-col min-h-screen">
-        <Header />
+        <HeaderServer />
         <div className="flex-1">{children}</div>
         <Footer />
       </div>
