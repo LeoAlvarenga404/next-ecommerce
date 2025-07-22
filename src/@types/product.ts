@@ -6,6 +6,7 @@ export interface IProductProductImage {
 export interface IProductCategory {
   category_id: string;
   name: string;
+  image?: string | null
 }
 export interface IProductAttribute {
   attribute_id: string;

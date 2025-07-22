@@ -15,9 +15,14 @@ export function FeaturedProductCarousel() {
 
   const products = data?.products || [];
   return (
-    <section className="py-8">
+    <section>
       <div className="container mx-auto px-4">
-        <h2 className="text-2xl font-bold mb-6">Produtos em Destaque</h2>
+        <div className="text-center mb-8">
+          <h1 className="text-3xl font-medium mb-3 text-foreground">
+            Produtos em destaque
+          </h1>
+          <div className="w-24 h-px bg-gradient-to-r from-gray-400 to-gray-600 mx-auto rounded-full"></div>
+        </div>
 
         <Carousel
           opts={{

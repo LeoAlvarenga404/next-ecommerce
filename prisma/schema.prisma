@@ -116,6 +116,7 @@ model CategoryAttribute {
 model Category {
   category_id       String              @id @default(uuid())
   name              String              @unique
+  image             String?
   products          Product[]           @relation("CategoryProducts")
   CategoryAttribute CategoryAttribute[]
 }
@@ -252,4 +253,16 @@ model WishlistItem {
   product  Product  @relation(fields: [product_id], references: [product_id])
 
   @@unique([wishlist_id, product_id], name: "unique_wishlist_item")
+}
+
+model Banners {
+  id          String   @id @default(uuid())
+  title       String?
+  description String?
+  image_url   String?
+  url_link    String?
+  created_at  DateTime @default(now())
+  updated_at  DateTime @updatedAt
+
+  @@unique([title, image_url], name: "unique_banner")
 }

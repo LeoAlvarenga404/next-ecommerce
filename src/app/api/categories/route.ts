@@ -7,6 +7,7 @@ export async function GET() {
       select: {
         category_id: true,
         name: true,
+        image: true,
       },
       orderBy: {
         name: "asc",

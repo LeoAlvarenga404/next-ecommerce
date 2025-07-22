@@ -1,12 +1,6 @@
 import { IProductCategory } from "@/@types/product";
-
-export interface ICategory {
-  category_id: string;
-  name: string;
-}
-
 export const categoryService = {
-  async getCategories(): Promise<ICategory[]> {
+  async getCategories(): Promise<IProductCategory[]> {
     try {
       const res = await fetch("/api/categories");
 

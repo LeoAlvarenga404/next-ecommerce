@@ -40,19 +40,23 @@ export async function verifyToken(token: string) {
   }
 }
 
+// ✅ Versão que NÃO modifica cookies - compatível com o código atual
 export async function getSession() {
   const cookieStore = await cookies();
   const accessToken = cookieStore.get("access_token")?.value;
   const refreshToken = cookieStore.get("refresh_token")?.value;
 
-  if (!accessToken && !refreshToken) return {session: null};
+  if (!accessToken && !refreshToken) {
+    return { session: null };
+  }
 
- try {
+  try {
     const payload = await verifyToken(accessToken || "");
-
     return { session: payload };
   } catch (error) {
-    if (!refreshToken) return { session: null };
+    if (!refreshToken) {
+      return { session: null };
+    }
 
     try {
       const tokenRecord = await prisma.refreshToken.findUnique({
@@ -61,50 +65,30 @@ export async function getSession() {
       });
 
       if (!tokenRecord || tokenRecord.expires_at < new Date()) {
-        await clearAuthCookies();
-        return { session: null };
+        // ❌ NÃO chama clearAuthCookies() aqui
+        return { session: null, needsCookieCleanup: true };
       }
 
       await verifyToken(refreshToken);
 
-      const newAccessToken = await createAccessToken({
-        user_id: tokenRecord.user.user_id,
-        email: tokenRecord.user.email,
-        role: tokenRecord.user.role,
-      });
-
-      const newRefreshToken = await createRefreshToken({
-        user_id: tokenRecord.user.user_id,
-        email: tokenRecord.user.email,
-        role: tokenRecord.user.role,
-      });
-
-      await prisma.refreshToken.delete({
-        where: { token: refreshToken },
-      });
-
-      await prisma.refreshToken.create({
-        data: {
-          user_id: tokenRecord.user.user_id,
-          token: newRefreshToken,
-          expires_at: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
-        },
-      });
-
+      // ❌ NÃO faz operações de banco nem cria tokens aqui
+      // Apenas indica que precisa renovar
       return {
         session: {
           user_id: tokenRecord.user.user_id,
           email: tokenRecord.user.email,
           role: tokenRecord.user.role,
         },
-        newTokens: {
-          accessToken: newAccessToken,
-          refreshToken: newRefreshToken,
+        needsRefresh: true,
+        refreshData: {
+          user_id: tokenRecord.user.user_id,
+          email: tokenRecord.user.email,
+          role: tokenRecord.user.role,
+          oldRefreshToken: refreshToken,
         },
       };
     } catch (refreshError) {
-      await clearAuthCookies();
-      return { session: null };
+      return { session: null, needsCookieCleanup: true };
     }
   }
 }
@@ -140,4 +124,55 @@ export async function clearAuthCookies() {
   const cookieStore = await cookies();
   cookieStore.delete("access_token");
   cookieStore.delete("refresh_token");
+}
+
+// ✅ Versão que não modifica cookies - apenas para verificação
+export async function getSessionReadOnly() {
+  const cookieStore = await cookies();
+  const accessToken = cookieStore.get("access_token")?.value;
+  const refreshToken = cookieStore.get("refresh_token")?.value;
+
+  if (!accessToken && !refreshToken) {
+    return { session: null };
+  }
+
+  try {
+    const payload = await verifyToken(accessToken || "");
+    return { session: payload };
+  } catch (error) {
+    if (!refreshToken) {
+      return { session: null, expired: true };
+    }
+
+    try {
+      const tokenRecord = await prisma.refreshToken.findUnique({
+        where: { token: refreshToken },
+        include: { user: true },
+      });
+
+      if (!tokenRecord || tokenRecord.expires_at < new Date()) {
+        return { session: null, expired: true };
+      }
+
+      await verifyToken(refreshToken);
+
+      // Retorna informações para renovação, mas não modifica nada
+      return {
+        session: {
+          user_id: tokenRecord.user.user_id,
+          email: tokenRecord.user.email,
+          role: tokenRecord.user.role,
+        },
+        needsRefresh: true,
+        refreshData: {
+          user_id: tokenRecord.user.user_id,
+          email: tokenRecord.user.email,
+          role: tokenRecord.user.role,
+          oldRefreshToken: refreshToken,
+        },
+      };
+    } catch (refreshError) {
+      return { session: null, expired: true };
+    }
+  }
 }
