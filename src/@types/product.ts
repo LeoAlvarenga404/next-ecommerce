@@ -1,34 +1,32 @@
 export interface IProductProductImage {
+  product_id: string;
+  image_id: string;
   url: string;
+  primary: boolean;
   alt_text?: string;
 }
 
 export interface IProductCategory {
   category_id: string;
   name: string;
-  image?: string | null
+  image?: string | null;
 }
+
 export interface IProductAttribute {
   attribute_id: string;
   name: string;
-  unit?: string;
-  type: string;
-}
-
-export interface IProductCategoryAttribute {
-  category_id: string;
-  name: string;
-  CategoryAttribute: {
-    some(arg0: (attr: any) => boolean): unknown;
-    attribute: IProductAttribute;
-  };
+  unit: string | null; 
+  type: "STRING" | "NUMBER" | "BOOLEAN";
 }
 
 export interface IProductAttributeValue {
+  product_id: string; 
+  value_id: string; 
   attribute_id: string;
   value: string;
   attribute: IProductAttribute;
 }
+
 export interface IProduct {
   product_id: string;
   name: string;
@@ -38,16 +36,9 @@ export interface IProduct {
   stock: number;
   sku: string;
   Category: IProductCategory | null;
-  ProductImage: IProductProductImage[]
-  ProductAttributeValue: IProductAttributeValue[]
-}
-
-export interface IProductsResponse {
-  products: IProduct[];
-  pagination: {
-    page: number;
-    limit: number;
-    total: number;
-    pages: number;
+  ProductImage: IProductProductImage[];
+  ProductAttributeValue: IProductAttributeValue[];
+  _count?: {
+    OrderItem: number;
   };
 }

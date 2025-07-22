@@ -24,4 +24,28 @@ export const serverProductService = {
       },
     });
   },
+  async getTopSellingProducts() {
+    return prisma.product.findMany({
+      include: {
+        Category: true,
+        ProductImage: true,
+        ProductAttributeValue: {
+          include: {
+            attribute: true,
+          }
+        },
+        _count: {
+          select: {
+            OrderItem: true,
+          },
+        },
+      },
+      orderBy: {
+        OrderItem: {
+          _count: "desc",
+        },
+      },
+      take: 20,
+    });
+  },
 };

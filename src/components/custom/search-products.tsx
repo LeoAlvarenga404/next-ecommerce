@@ -10,13 +10,15 @@ import Image from "next/image";
 import { formatPriceToBrazilianCurrency } from "@/utils/formatter/price";
 import { calculateValueWithDiscount } from "@/utils/value-with-discount";
 import { Separator } from "../ui/separator";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { IProduct } from "@/@types/product";
 export function SearchProducts() {
   const [search, setSearch] = useState("");
   const { filters, setFilter } = useProductFilter();
   const { data } = useFilteredProducts({ ...filters, search });
   const products = data?.products || [];
+
+  const ref = useRef<HTMLDivElement>(null);
 
   function handleNavitateToProduct(productId: string) {
     setFilter("search", "");

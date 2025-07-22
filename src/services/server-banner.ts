@@ -1,8 +1,11 @@
 import { prisma } from "@/lib/prisma";
 import { cache } from "react";
 
-const getBannersFromDB = cache(async () => {
+const getBannersFromDB = cache(async (display_on: string) => {
   return prisma.banners.findMany({
+    where: {
+      display_on: display_on,
+    },
     select: {
       id: true,
       title: true,
@@ -14,9 +17,9 @@ const getBannersFromDB = cache(async () => {
 });
 
 export const serverBannerService = {
-  async getBanners() {
+  async getBanners(display_on: string) {
     try {
-      return await getBannersFromDB();
+      return await getBannersFromDB(display_on);
     } catch (error) {
       console.error("Error fetching banners from database:", error);
       return [];

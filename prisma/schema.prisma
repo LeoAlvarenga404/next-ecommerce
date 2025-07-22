@@ -261,6 +261,7 @@ model Banners {
   description String?
   image_url   String?
   url_link    String?
+  display_on  String? @default("HOME")
   created_at  DateTime @default(now())
   updated_at  DateTime @updatedAt
 

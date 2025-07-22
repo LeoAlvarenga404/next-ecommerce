@@ -28,11 +28,11 @@ export async function FeaturedCategory() {
   }
 
   return (
-    <section className="py-8">
+    <section className="py-0">
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between mb-6">
           <h2 className="text-2xl font-bold text-gray-900">
-            Busque por categoria
+            Busque por Categoria
           </h2>
         </div>
 
