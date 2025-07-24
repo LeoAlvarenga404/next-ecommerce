@@ -1,7 +1,7 @@
-import type { IProduct, IProductsResponse } from "@/@types/product";
+import type { IProduct } from "@/@types/product";
 
 export const clientProductService = {
-  async getProducts(): Promise<IProductsResponse> {
+  async getProducts(): Promise<IProduct[]> {
     try {
       const res = await fetch("/api/products");
 
@@ -9,7 +9,7 @@ export const clientProductService = {
         throw new Error("Falha ao buscar produtos");
       }
 
-      return res.json();
+      return res.json() ?? [];
     } catch (error) {
       console.error(error);
       throw error;

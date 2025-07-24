@@ -1,4 +1,3 @@
-
 import { FeaturedCategory } from "@/components/section/featured-category";
 import { GenericBanner } from "@/components/section/generic-banner";
 import { HomeCarousel } from "@/components/section/home-carousel";
@@ -10,7 +9,6 @@ export default function Home() {
       <HomeCarousel />
       <FeaturedCategory />
       <FeaturedProducts />
-      <GenericBanner />
     </div>
   );
 }

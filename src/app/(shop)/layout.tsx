@@ -25,3 +25,9 @@ export default function ShopLayout({
     </ThemeProvider>
   );
 }
+
+// glock-18 shinobu FT - 27 reais;
+// awp neo noir - 159 - 172 reais;
+// ak-74 desejo noturno ft - 51 reais;
+
+// total = 250 reais;
