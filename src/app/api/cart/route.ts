@@ -137,8 +137,7 @@ export async function POST(request: NextRequest) {
 }
 
 export async function PUT(
-  request: NextRequest,
-  { params }: { params: { id: string } }
+  request: NextRequest
 ) {
   try {
     const session = await getSession();
@@ -146,8 +145,7 @@ export async function PUT(
       return NextResponse.json({ error: "Não autorizado" }, { status: 401 });
     }
 
-    const { quantity } = await request.json();
-    const { id } = params;
+    const { id, quantity } = await request.json();
 
     await prisma.cartItem.update({
       where: { cart_item_id: id },
@@ -163,17 +161,21 @@ export async function PUT(
   }
 }
 
-export async function DELETE(
-  request: NextRequest,
-  { params }: { params: { id: string } }
-) {
+export async function DELETE(request: NextRequest,) {
   try {
     const session = await getSession();
     if (!session) {
       return NextResponse.json({ error: "Não autorizado" }, { status: 401 });
     }
 
-    const { id } = params;
+    const { id } = await request.json();
+
+    if (!id) {
+      return NextResponse.json(
+        { error: "ID do item é obrigatório" },
+        { status: 400 }
+      );
+    }
 
     await prisma.cartItem.delete({
       where: { cart_item_id: id },

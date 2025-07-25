@@ -25,9 +25,29 @@ const addToCart = async (productId: string, quantity: number) => {
   return response.json();
 };
 
+const updateQuantityInCart = async (productId: string, quantity: number) => {
+  const response = await fetch(`/api/cart/`, {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ id: productId, quantity }),
+  });
+  if (!response.ok) {
+    throw new Error("Falha ao atualizar a quantidade");
+  }
+  return response.json();
+};
+
 const removeFromCart = async (productId: string) => {
-  const response = await fetch(`/api/cart/${productId}`, {
+  const response = await fetch(`/api/cart/`, {
     method: "DELETE",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      id: productId,
+    }),
   });
   if (!response.ok) {
     throw new Error("Falha ao remover do carrinho");
@@ -61,10 +81,24 @@ export const useCart = () => {
     },
   });
 
+  const { mutate: updateItemQuantity } = useMutation({
+    mutationFn: ({
+      productId,
+      quantity,
+    }: {
+      productId: string;
+      quantity: number;
+    }) => updateQuantityInCart(productId, quantity),
+    onSuccess: () => {
+      refetchCart();
+    },
+  });
+
   return {
     cart,
     addItem,
     isLoadingCart,
+    updateItemQuantity, 
     removeItem,
   };
 };

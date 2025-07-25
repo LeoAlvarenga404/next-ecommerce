@@ -4,13 +4,26 @@ import Link from "next/link";
 interface HeaderProfileProps {
   user: any;
   onLogout: () => void;
+  isLoading?: boolean;
 }
 
-export function HeaderProfile({ user, onLogout }: HeaderProfileProps) {
+export function HeaderProfile({
+  user,
+  onLogout,
+  isLoading = false,
+}: HeaderProfileProps) {
+  
+  function handleNavigateToProfile() {
+    if (user) {
+      window.location.href = "/profile";
+    }
+  }
+
   return (
-    <div className="flex items-center gap-3 pl-2 border-l border-border">
+    <div className="flex items-center gap-3 pl-2 border-l border-border cursor-pointer">
       <div
         className={`flex items-center justify-center size-8 rounded-full border transition-colors`}
+        onClick={handleNavigateToProfile}
       >
         <User
           className={`size-4 ${
@@ -20,7 +33,12 @@ export function HeaderProfile({ user, onLogout }: HeaderProfileProps) {
       </div>
 
       <div className="hidden md:flex flex-col">
-        <div className="text-sm font-medium text-foreground">Conta</div>
+        <div
+          className="text-sm font-medium text-foreground"
+          onClick={handleNavigateToProfile}
+        >
+          Conta
+        </div>
 
         {user ? (
           <div className="text-xs text-muted-foreground">
@@ -36,27 +54,7 @@ export function HeaderProfile({ user, onLogout }: HeaderProfileProps) {
         )}
       </div>
 
-      <div className="flex items-center">
-        {user ? (
-          <button
-            onClick={onLogout}
-            className="flex items-center gap-2 px-3 py-2 rounded-lg text-sm text-muted-foreground hover:text-destructive transition-all duration-200 cursor-pointer"
-            title="Sair"
-          >
-            <LogOutIcon className="size-4" />
-            <span className="hidden sm:inline">Sair</span>
-          </button>
-        ) : (
-          <div className="md:hidden">
-            <Link
-              href="/login"
-              className="text-sm text-primary hover:text-primary/80 transition-colors font-medium px-2 py-1 rounded-md hover:bg-primary/10"
-            >
-              Entrar
-            </Link>
-          </div>
-        )}
-      </div>
+
     </div>
   );
 }

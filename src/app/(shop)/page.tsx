@@ -5,7 +5,7 @@ import { FeaturedProducts } from "@/components/section/featured-products";
 
 export default function Home() {
   return (
-    <div className="w-full min-h-screen flex flex-col gap-8">
+    <div className="w-full min-h-screen flex flex-col gap-12">
       <HomeCarousel />
       <FeaturedCategory />
       <FeaturedProducts />

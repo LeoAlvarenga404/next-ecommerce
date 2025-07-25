@@ -2,30 +2,37 @@
 
 import { SearchProducts } from "../../custom/search-products";
 import {
-  LogOutIcon,
   LayoutDashboard,
   ListOrdered,
-  ShoppingCart,
-  User,
   ShoppingBag,
   Heart,
 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { HeaderProfile } from "./header-profile";
+import { useAuth } from "@/hooks/use-auth";
+import { useEffect } from "react";
+import { useRouter } from "next/navigation";
 
-export function HeaderClient({ session }: { session: any }) {
-  const user = session?.session;
+interface HeaderClientProps {
+  initialSession: any;
+}
 
-  const handleLogout = async () => {
-    await fetch("/api/auth/logout", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-    }).then(() => {
-      window.location.href = "/";
-    });
+export function HeaderClient({ initialSession }: HeaderClientProps) {
+  const { user, logout, isLogoutPending, isAuthenticated } = useAuth();
+  const router = useRouter();
+  
+  const currentUser = user || initialSession?.session;
+  
+  useEffect(() => {
+    const initialIsAuthenticated = !!initialSession?.session;
+    if (initialIsAuthenticated !== isAuthenticated && user !== undefined) {
+      router.refresh();
+    }
+  }, [isAuthenticated, user, initialSession, router]);
+
+  const handleLogout = () => {
+    logout();
   };
 
   return (
@@ -45,7 +52,7 @@ export function HeaderClient({ session }: { session: any }) {
           </div>
 
           <div className="flex gap-0 items-center">
-            {user && user.role === "ADMIN" && (
+            {currentUser && currentUser.role === "ADMIN" && (
               <Link
                 href="/admin"
                 className="flex items-center gap-2 px-3 py-2 rounded-lg text-sm text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-all duration-200"
@@ -53,7 +60,7 @@ export function HeaderClient({ session }: { session: any }) {
                 <LayoutDashboard className="size-5" />
               </Link>
             )}
-            {user && (
+            {currentUser && (
               <Link
                 href="/orders"
                 className="flex items-center gap-2 px-3 py-2 rounded-lg text-sm text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-all duration-200"
@@ -85,7 +92,11 @@ export function HeaderClient({ session }: { session: any }) {
               </div>
             </Link>
 
-            <HeaderProfile user={user} onLogout={handleLogout} />
+            <HeaderProfile 
+              user={currentUser} 
+              onLogout={handleLogout}
+              isLoading={isLogoutPending}
+            />
           </div>
         </div>
       </div>

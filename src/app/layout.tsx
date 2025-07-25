@@ -2,8 +2,7 @@ import type { Metadata } from "next";
 import { DM_Sans, Playfair_Display } from "next/font/google";
 import "./globals.css";
 import { QueryProvider } from "@/providers/query-provider";
-import { AuthProvider } from "@/contexts/auth-context";
-import { ThemeProvider } from "@/components/layouts/theme-provider";
+import { Toaster } from "sonner";
 
 export const fontSans = DM_Sans({
   subsets: ["latin"],
@@ -30,7 +29,8 @@ export default function RootLayout({
         className={`${fontSans.variable} ${fontSerif.variable} antialiased font-sans`}
       >
         <QueryProvider>
-          <AuthProvider>{children}</AuthProvider>
+          {children}
+          <Toaster />
         </QueryProvider>
       </body>
     </html>

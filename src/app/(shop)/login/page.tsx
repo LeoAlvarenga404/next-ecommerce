@@ -8,7 +8,7 @@ import Link from "next/link";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
-import { useAuth } from "@/contexts/auth-context";
+import { useAuth } from "@/hooks/use-auth";
 const loginSchema = z.object({
   email: z.email("Email inválido"),
   password: z.string(),
@@ -31,7 +31,7 @@ export default function LoginPage() {
   });
 
   function onSubmit(data: LoginFormData) {
-    login(data.email, data.password);
+    login(data);
   }
 
   return (

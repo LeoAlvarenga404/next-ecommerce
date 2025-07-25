@@ -12,7 +12,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { useAuth } from "@/contexts/auth-context";
+import { useAuth } from "@/hooks/use-auth";
 import Link from "next/link";
 import { useState } from "react";
 import { z } from "zod";
@@ -30,6 +30,11 @@ import {
   Truck,
   User,
 } from "lucide-react";
+import { useCart } from "@/hooks/use-cart";
+import { IProduct } from "@/@types/product";
+import Image from "next/image";
+import { formatPriceToBrazilianCurrency } from "@/utils/formatter/price";
+import { calculateValueWithDiscount } from "@/utils/value-with-discount";
 
 const steps = [
   { id: 1, title: "Informações", icon: User },
@@ -39,9 +44,9 @@ const steps = [
 
 export default function CheckoutPage() {
   const [loading, setLoading] = useState(false);
+  const { cart } = useCart();
   const { isAuthenticated } = useAuth();
-  const [step, setStep] = useState(1);
-
+  const [step, setStep] = useState(3);
   const form = useForm<ICheckoutSchema>({
     resolver: zodResolver(checkoutSchema),
     defaultValues: {
@@ -58,6 +63,7 @@ export default function CheckoutPage() {
       },
     },
   });
+  console.log("Cart Items:", cart?.CartItem);
 
   const handleNext = async () => {
     let fieldsToValidate: (keyof ICheckoutSchema)[] = [];
@@ -178,7 +184,6 @@ export default function CheckoutPage() {
   return (
     <div className="min-h-screen bg-gray-50/30">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Header */}
         <div className="flex items-center gap-4 mb-8">
           <Link href="/cart">
             <Button variant="ghost">
@@ -196,7 +201,6 @@ export default function CheckoutPage() {
             onSubmit={form.handleSubmit(handleCheckout)}
             className="space-y-6"
           >
-            {/* Step 1: Shipping Information */}
             {step === 1 && (
               <Card>
                 <CardHeader>
@@ -348,7 +352,6 @@ export default function CheckoutPage() {
               </Card>
             )}
 
-            {/* Step 2: Payment Method */}
             {step === 2 && (
               <Card>
                 <CardHeader>
@@ -408,7 +411,6 @@ export default function CheckoutPage() {
               </Card>
             )}
 
-            {/* Step 3: Order Review */}
             {step === 3 && (
               <Card>
                 <CardHeader>
@@ -466,6 +468,57 @@ export default function CheckoutPage() {
                         </div>
                       </div>
                     </div>
+                  </div>
+                  <div className="space-y-4">
+                    <h3 className="font-semibold mb-3 flex items-center gap-2">
+                      <Package className="h-4 w-4" />
+                      Produtos
+                    </h3>
+                    {cart?.CartItem?.map((item: any) => {
+                      const product = item.product as IProduct;
+
+                      return (
+                        <div className="space-y-3" key={product.product_id}>
+                          <div className="flex items-center gap-4">
+                            <div className="relative w-16 h-16 bg-muted rounded-lg overflow-hidden flex-shrink-0">
+                              {product.ProductImage[0]?.url ? (
+                                <Image
+                                  src={product.ProductImage[0].url}
+                                  alt={product.name}
+                                  fill
+                                  className="object-cover"
+                                />
+                              ) : (
+                                <div className="w-full h-full flex items-center justify-center">
+                                  <Package className="h-6 w-6 text-muted-foreground" />
+                                </div>
+                              )}
+                            </div>
+                            <div className="flex-1 min-w-0">
+                              <p className="font-medium truncate">
+                                {product.name}
+                              </p>
+                              <p className="text-sm text-muted-foreground">
+                                Quantidade: {item.quantity}
+                              </p>
+                            </div>
+                            <div className="text-right">
+                              <p className="font-medium">
+                                {formatPriceToBrazilianCurrency(
+                                  calculateValueWithDiscount(
+                                    product.price,
+                                    product.discount || 0
+                                  )
+                                )}
+                              </p>
+                              <p className="text-sm text-muted-foreground">
+                                por unidade
+                              </p>
+                            </div>
+                          </div>
+                        </div>
+                      );
+                    })}
                   </div>
 
                   <div className="border-t pt-6">

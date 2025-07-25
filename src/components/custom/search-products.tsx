@@ -94,11 +94,6 @@ export function SearchProducts() {
                       </span>
                     )}
                   </div>
-
-                  <div className="flex items-center gap-1 text-xs text-muted-foreground text-nowrap">
-                    <Star className="w-3 h-3 fill-yellow-400 text-yellow-400" />
-                    <span>Mais vendido</span>
-                  </div>
                 </div>
 
                 <div className="flex-shrink-0 opacity-0 group-hover:opacity-100 transition-opacity">

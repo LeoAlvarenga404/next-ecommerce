@@ -22,23 +22,24 @@ import { useState } from "react";
 import { formatPriceToBrazilianCurrency } from "@/utils/formatter/price";
 
 export default function CartPage() {
-  const { cart, isLoadingCart } = useCart();
+  const { cart, isLoadingCart, updateItemQuantity, removeItem } = useCart();
   const [isUpdating, setIsUpdating] = useState<string | null>(null);
 
   const updateQuantity = async (itemId: string, newQuantity: number) => {
     if (newQuantity < 1) return;
-    setIsUpdating(itemId);
-    await new Promise((resolve) => setTimeout(resolve, 500));
 
+    setIsUpdating(itemId);
+    await updateItemQuantity({
+      productId: itemId,
+      quantity: newQuantity,
+    });
     setIsUpdating(null);
   };
 
-  const removeItem = async (itemId: string) => {
-    setIsUpdating(itemId);
-    await new Promise((resolve) => setTimeout(resolve, 500));
-
+  const handleRemoveItemToCart = async (itemId: string) => {
     setIsUpdating(null);
-  };
+    await removeItem(itemId);
+  }
 
   function calculateValueWithDiscount(price: number, discount: number) {
     return price - (price * discount) / 100;
@@ -159,7 +160,7 @@ export default function CartPage() {
                           <Button
                             variant="ghost"
                             size="icon"
-                            onClick={() => removeItem(item.cart_item_id)}
+                            onClick={() => handleRemoveItemToCart(item.cart_item_id)}
                             disabled={isUpdating === item.cart_item_id}
                             className="text-red-500 hover:text-red-700 hover:bg-red-50"
                           >
@@ -281,21 +282,6 @@ export default function CartPage() {
                     Finalizar Compra
                   </Button>
                 </Link>
-
-                <div className="space-y-3 pt-4 border-t">
-                  <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                    <Shield className="w-4 h-4 text-green-600" />
-                    <span>Compra 100% segura</span>
-                  </div>
-                  <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                    <Truck className="w-4 h-4 text-blue-600" />
-                    <span>Entrega em 2-5 dias úteis</span>
-                  </div>
-                  <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                    <Package className="w-4 h-4 text-purple-600" />
-                    <span>Troca grátis em 30 dias</span>
-                  </div>
-                </div>
               </CardContent>
             </Card>
           </div>

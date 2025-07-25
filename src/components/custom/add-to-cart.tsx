@@ -1,9 +1,9 @@
 "use client";
 import { useCart } from "@/hooks/use-cart";
-import { useAuth } from "@/contexts/auth-context";
+import { useAuth } from "@/hooks/use-auth";
 import { ShoppingCart, Plus } from "lucide-react";
 import { useState } from "react";
-
+import { toast } from "sonner";
 export function AddToCart({
   productId,
   quantity = 1,
@@ -49,7 +49,11 @@ export function AddToCart({
         );
       }
 
-      await new Promise((resolve) => setTimeout(resolve, 500));
+      await new Promise((resolve) => setTimeout(resolve, 500))
+      toast.success("Produto adicionado ao carrinho !");
+    } catch (error) {
+      toast.error("Erro ao adicionar produto ao carrinho. Tente novamente.");
+      console.error("Erro ao adicionar item ao carrinho:", error);
     } finally {
       setIsAdding(false);
     }

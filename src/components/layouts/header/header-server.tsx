@@ -4,5 +4,5 @@ import { HeaderClient } from "./header-client";
 export async function HeaderServer() {
   const sessionData = await getSessionReadOnly();
   
-  return <HeaderClient session={sessionData} />;
+  return <HeaderClient initialSession={sessionData} />;
 }
