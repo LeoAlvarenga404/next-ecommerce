@@ -67,18 +67,7 @@ export function HeaderClient({ initialSession }: HeaderClientProps) {
               >
                 <ListOrdered className="size-5" />
               </Link>
-            )}
-            <Link
-              href="/wishlist"
-              className="flex items-center gap-2 px-3 py-2 rounded-lg text-sm text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-all duration-200"
-            >
-              <div className="relative">
-                <Heart className="size-5" />
-                <span className="absolute -top-1.5 -right-1.5 bg-destructive text-primary-foreground text-xs rounded-full h-4 w-4 flex items-center justify-center">
-                  1
-                </span>
-              </div>
-            </Link>
+            )} 
 
             <Link
               href="/cart"

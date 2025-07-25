@@ -6,6 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { ProductImage } from "@/components/custom/image";
 import { useCart } from "@/hooks/use-cart";
+import { useAuth } from "@/hooks/use-auth";
 import Link from "next/link";
 import {
   ShoppingCart,
@@ -15,46 +16,98 @@ import {
   ArrowLeft,
   Package,
   CreditCard,
-  Truck,
-  Shield,
 } from "lucide-react";
 import { useState } from "react";
 import { formatPriceToBrazilianCurrency } from "@/utils/formatter/price";
+import { IProduct } from "@/@types/product";
+
+interface CartItemAPI {
+  cart_item_id: string;
+  product: IProduct;
+  quantity: number;
+}
+
+interface CartItemLocal {
+  product: IProduct;
+  quantity: number;
+}
+
+type CartItem = CartItemAPI | CartItemLocal;
+
+// Função para verificar se é um item da API
+const isAPICartItem = (item: CartItem): item is CartItemAPI => {
+  return "cart_item_id" in item;
+};
+
+// Função para obter o ID único do item
+const getItemId = (item: CartItem): string => {
+  return isAPICartItem(item) ? item.cart_item_id : item.product.product_id;
+};
 
 export default function CartPage() {
   const { cart, isLoadingCart, updateItemQuantity, removeItem } = useCart();
+  const { user } = useAuth();
   const [isUpdating, setIsUpdating] = useState<string | null>(null);
 
-  const updateQuantity = async (itemId: string, newQuantity: number) => {
-    if (newQuantity < 1) return;
+  // Normaliza os dados do carrinho para funcionar tanto com API quanto localStorage
+  const normalizeCartData = () => {
+    if (!cart) return [];
 
-    setIsUpdating(itemId);
-    await updateItemQuantity({
-      productId: itemId,
-      quantity: newQuantity,
-    });
-    setIsUpdating(null);
+    // Se for dados da API
+    if (cart.CartItem) {
+      return cart.CartItem;
+    }
+
+    // Se for dados do localStorage (array direto)
+    if (Array.isArray(cart)) {
+      return cart;
+    }
+
+    return [];
   };
 
-  const handleRemoveItemToCart = async (itemId: string) => {
-    setIsUpdating(null);
-    await removeItem(itemId);
-  }
+  const cartItems = normalizeCartData();
+
+  const updateQuantity = async (item: CartItem, newQuantity: number) => {
+    if (newQuantity < 1) return;
+
+    const itemId = getItemId(item);
+    setIsUpdating(itemId);
+
+    try {
+      await updateItemQuantity({
+        product: item.product,
+        quantity: newQuantity,
+      });
+    } catch (error) {
+      console.error("Erro ao atualizar quantidade:", error);
+    } finally {
+      setIsUpdating(null);
+    }
+  };
+
+  const handleRemoveItemToCart = async (item: CartItem) => {
+    const itemId = getItemId(item);
+    setIsUpdating(itemId);
+
+    try {
+      await removeItem(item.product);
+    } catch (error) {
+      console.error("Erro ao remover item:", error);
+    } finally {
+      setIsUpdating(null);
+    }
+  };
 
   function calculateValueWithDiscount(price: number, discount: number) {
     return price - (price * discount) / 100;
   }
 
   const calculateSubtotal = () => {
-    if (!cart?.CartItem) return 0;
-    return cart.CartItem.reduce((sum: number, item: any) => {
+    return cartItems.reduce((sum: number, item: CartItem) => {
       return (
         sum +
-        calculateValueWithDiscount(
-          item.product.price,
-          item.product.discount || 0
-        ) *
-          item.quantity
+        calculateValueWithDiscount(item.product.price, item.product.discount || 0) * item.quantity
       );
     }, 0);
   };
@@ -66,12 +119,12 @@ export default function CartPage() {
   if (isLoadingCart) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <div className="loader" />
+        <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-primary"></div>
       </div>
     );
   }
 
-  if (!cart?.CartItem || cart.CartItem.length === 0) {
+  if (!cartItems || cartItems.length === 0) {
     return (
       <div className="min-h-screen bg-gray-50/30">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -118,20 +171,22 @@ export default function CartPage() {
           </Link>
           <h1 className="text-3xl font-bold">Carrinho de Compras</h1>
           <Badge variant="secondary">
-            {cart.CartItem.length}{" "}
-            {cart.CartItem.length === 1 ? "item" : "itens"}
+            {cartItems.length} {cartItems.length === 1 ? "item" : "itens"}
           </Badge>
+
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           <div className="lg:col-span-2 space-y-4">
-            {cart.CartItem.map((item: any) => {
+            {cartItems.map((item: CartItem) => {
               const valueWithDiscount =
                 item.product.price -
                 (item.product.price * (item.product.discount || 0)) / 100;
 
+              const itemId = getItemId(item);
+
               return (
-                <Card key={item.cart_item_id} className="overflow-hidden">
+                <Card key={itemId} className="overflow-hidden">
                   <CardContent className="p-6">
                     <div className="flex gap-4">
                       <div className="w-24 h-24 bg-gray-100 rounded-lg overflow-hidden flex-shrink-0">
@@ -160,11 +215,11 @@ export default function CartPage() {
                           <Button
                             variant="ghost"
                             size="icon"
-                            onClick={() => handleRemoveItemToCart(item.cart_item_id)}
-                            disabled={isUpdating === item.cart_item_id}
+                            onClick={() => handleRemoveItemToCart(item)}
+                            disabled={isUpdating === itemId}
                             className="text-red-500 hover:text-red-700 hover:bg-red-50"
                           >
-                            {isUpdating === item.cart_item_id ? (
+                            {isUpdating === itemId ? (
                               <div className="w-4 h-4 border-2 border-red-500 border-t-transparent rounded-full animate-spin" />
                             ) : (
                               <Trash2 className="w-4 h-4" />
@@ -179,14 +234,10 @@ export default function CartPage() {
                               size="icon"
                               className="h-8 w-8"
                               onClick={() =>
-                                updateQuantity(
-                                  item.cart_item_id,
-                                  item.quantity - 1
-                                )
+                                updateQuantity(item, item.quantity - 1)
                               }
                               disabled={
-                                item.quantity <= 1 ||
-                                isUpdating === item.cart_item_id
+                                item.quantity <= 1 || isUpdating === itemId
                               }
                             >
                               <Minus className="w-3 h-3" />
@@ -199,12 +250,9 @@ export default function CartPage() {
                               size="icon"
                               className="h-8 w-8"
                               onClick={() =>
-                                updateQuantity(
-                                  item.cart_item_id,
-                                  item.quantity + 1
-                                )
+                                updateQuantity(item, item.quantity + 1)
                               }
-                              disabled={isUpdating === item.cart_item_id}
+                              disabled={isUpdating === itemId}
                             >
                               <Plus className="w-3 h-3" />
                             </Button>
@@ -282,6 +330,12 @@ export default function CartPage() {
                     Finalizar Compra
                   </Button>
                 </Link>
+
+                {!user && (
+                  <div className="text-xs text-muted-foreground text-center">
+                    💡 Faça login para sincronizar seu carrinho
+                  </div>
+                )}
               </CardContent>
             </Card>
           </div>

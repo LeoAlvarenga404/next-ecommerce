@@ -1,6 +1,5 @@
 import type { IProduct } from "@/@types/product";
 import { ProductImage } from "./image";
-import { AddToWishlist } from "./add-to-wishlist";
 import { Card } from "@/components/ui/card";
 import { formatPriceToBrazilianCurrency } from "@/utils/formatter/price";
 import { Badge } from "@/components/ui/badge";
@@ -10,10 +9,7 @@ import { AddToCart } from "./add-to-cart";
 import { calculateValueWithDiscount } from "@/utils/value-with-discount";
 
 export function ProductCard({ product }: { product: IProduct }) {
-  const price = calculateValueWithDiscount(
-    product.price,
-    product.discount || 0
-  );
+  const price = calculateValueWithDiscount(product.price, product.discount || 0);
   const hasDiscount = (product.discount || 0) > 0;
 
   return (
@@ -23,9 +19,6 @@ export function ProductCard({ product }: { product: IProduct }) {
     >
       <div className="relative aspect-square overflow-hidden bg-gray-50">
         <ProductImage src={product?.ProductImage[0]?.url} alt={product.name} />
-        <div className="absolute top-3 right-3 z-10">
-          <AddToWishlist productId={product.product_id} />
-        </div>
       </div>
 
       <div className="p-4 flex flex-col flex-1">
@@ -75,7 +68,7 @@ export function ProductCard({ product }: { product: IProduct }) {
           </Link>
           <div className="flex items-center">
             <AddToCart
-              productId={product.product_id}
+              product={product}
               quantity={1}
               variant="icon"
             />

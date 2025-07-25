@@ -1,96 +1,117 @@
-import { useQuery, useMutation } from "@tanstack/react-query";
-
-const getCart = async () => {
-  const response = await fetch("/api/cart");
-  if (!response.ok) {
-    throw new Error("Failed to fetch cart");
-  }
-  return response.json();
-};
-
-const addToCart = async (productId: string, quantity: number) => {
-  const response = await fetch("/api/cart/", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      product_id: productId,
-      quantity: quantity,
-    }),
-  });
-  if (!response.ok) {
-    throw new Error("Falha ao adicionar ao carrinho");
-  }
-  return response.json();
-};
-
-const updateQuantityInCart = async (productId: string, quantity: number) => {
-  const response = await fetch(`/api/cart/`, {
-    method: "PUT",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({ id: productId, quantity }),
-  });
-  if (!response.ok) {
-    throw new Error("Falha ao atualizar a quantidade");
-  }
-  return response.json();
-};
-
-const removeFromCart = async (productId: string) => {
-  const response = await fetch(`/api/cart/`, {
-    method: "DELETE",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      id: productId,
-    }),
-  });
-  if (!response.ok) {
-    throw new Error("Falha ao remover do carrinho");
-  }
-  return response.json();
-};
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useAuth } from "@/hooks/use-auth";
+import { addToLocalCart, getLocalCart, updateLocalCartQuantity, removeFromLocalCart } from './use-local-cart'
+import { IProduct } from "@/@types/product";
 
 export const useCart = () => {
+  const { user } = useAuth();
+  const queryClient = useQueryClient();
+
+  const getCart = async () => {
+    if (!user) {
+      return getLocalCart();
+    }
+    const response = await fetch("/api/cart");
+    if (!response.ok) {
+      throw new Error("Failed to fetch cart");
+    }
+    return response.json();
+  };
+  
+  const addToCart = async (product: IProduct, quantity: number) => {
+    if (!user) {
+      addToLocalCart({ product, quantity });
+      return { success: true };
+    }
+    const response = await fetch("/api/cart/", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        product_id: product.product_id,
+        quantity: quantity,
+      }),
+    });
+    if (!response.ok) {
+      throw new Error("Falha ao adicionar ao carrinho");
+    }
+    return response.json();
+  };
+
+  const updateQuantityInCart = async (product: IProduct, quantity: number) => {
+    if (!user) {
+      updateLocalCartQuantity(product.product_id, quantity);
+      return { success: true };
+    }
+    const response = await fetch(`/api/cart/`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ id: product.product_id, quantity }),
+    });
+    if (!response.ok) {
+      throw new Error("Falha ao atualizar a quantidade");
+    }
+    return response.json();
+  };
+
+  const removeFromCart = async (product: IProduct) => {
+    if (!user) {
+      removeFromLocalCart(product.product_id);
+      return { success: true };
+    }
+    const response = await fetch(`/api/cart/`, {
+      method: "DELETE",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        id: product.product_id,
+      }),
+    });
+    if (!response.ok) {
+      throw new Error("Falha ao remover do carrinho");
+    }
+    return response.json();
+  };
+
   const { data: cart, refetch: refetchCart, isLoading: isLoadingCart } = useQuery({
-    queryKey: ["cart"],
+    queryKey: ["cart", user?.user_id],
     queryFn: getCart,
   });
 
-  const { mutate: addItem } = useMutation({
+  const { mutate: addItem, isPending: isAddingItem } = useMutation({
     mutationFn: ({
-      productId,
+      product,
       quantity,
     }: {
-      productId: string;
+      product: IProduct;
       quantity: number;
-    }) => addToCart(productId, quantity),
+    }) => addToCart(product, quantity),
     onSuccess: () => {
-      refetchCart();
+      queryClient.invalidateQueries({ queryKey: ["cart", user?.user_id] });
     },
   });
 
-  const { mutate: removeItem } = useMutation({
+  const { mutate: removeItem, isPending: isRemovingItem } = useMutation({
     mutationFn: removeFromCart,
     onSuccess: () => {
-      refetchCart();
+      queryClient.invalidateQueries({ queryKey: ["cart", user?.user_id] });
     },
   });
 
-  const { mutate: updateItemQuantity } = useMutation({
+  const { mutate: updateItemQuantity, isPending: isUpdatingQuantity } = useMutation({
     mutationFn: ({
-      productId,
+      product,
       quantity,
     }: {
-      productId: string;
+      product: IProduct;
       quantity: number;
-    }) => updateQuantityInCart(productId, quantity),
+    }) => updateQuantityInCart(product, quantity),
     onSuccess: () => {
-      refetchCart();
+      queryClient.invalidateQueries({ queryKey: ["cart", user?.user_id] });
     },
   });
 
@@ -98,6 +119,9 @@ export const useCart = () => {
     cart,
     addItem,
     isLoadingCart,
+    isAddingItem,
+    isRemovingItem,
+    isUpdatingQuantity,
     updateItemQuantity, 
     removeItem,
   };
