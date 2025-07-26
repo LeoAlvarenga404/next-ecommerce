@@ -33,6 +33,31 @@ export const categoryService = {
       throw error;
     }
   },
+
+  async getCategoryByName(name: string): Promise<IProductCategory | null> {
+    try {
+      const res = await fetch(`/api/categories/name/`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ name }),
+      });
+
+      if (!res.ok) {
+        throw new Error("Falha ao buscar categoria pelo nome");
+      }
+      if (res.status === 404) {
+        return null;
+      }
+
+      return res.json();
+    } catch (error) {
+      console.error(error);
+      throw error;
+    }
+  },
+
   async createCategory(name: string): Promise<IProductCategory> {
     try {
       const res = await fetch("/api/products/categories", {

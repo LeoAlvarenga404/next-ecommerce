@@ -1,6 +1,13 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useAuth } from "@/hooks/use-auth";
-import { addToLocalCart, getLocalCart, updateLocalCartQuantity, removeFromLocalCart } from './use-local-cart'
+import {
+  addToLocalCart,
+  getLocalCart,
+  updateLocalCartQuantity,
+  removeFromLocalCart,
+  getTotalQuantityLocalCart,
+  clearLocalCart,
+} from "./use-local-cart";
 import { IProduct } from "@/@types/product";
 
 export const useCart = () => {
@@ -17,7 +24,7 @@ export const useCart = () => {
     }
     return response.json();
   };
-  
+
   const addToCart = async (product: IProduct, quantity: number) => {
     if (!user) {
       addToLocalCart({ product, quantity });
@@ -57,6 +64,32 @@ export const useCart = () => {
     return response.json();
   };
 
+  const getTotalQuantity = () => {
+    if (!user) {
+      return getTotalQuantityLocalCart();
+    }
+    const cartData = queryClient.getQueryData(["cart", user?.user_id]) as
+      | { totalQuantity?: { CartItem: number } }
+      | undefined;
+    return cartData?.totalQuantity ?? 0;
+  };
+
+  const syncLocalCartToServer = async () => {
+    if (!user) {
+      return;
+    }
+    const localCart = getLocalCart();
+    if (localCart.length === 0) return;
+
+    for (const item of localCart) {
+      await addToCart(item.product, item.quantity);
+    }
+
+    clearLocalCart();
+    queryClient.invalidateQueries({ queryKey: ["cart", user?.user_id] });
+    return { success: true };
+  };
+
   const removeFromCart = async (product: IProduct) => {
     if (!user) {
       removeFromLocalCart(product.product_id);
@@ -77,7 +110,11 @@ export const useCart = () => {
     return response.json();
   };
 
-  const { data: cart, refetch: refetchCart, isLoading: isLoadingCart } = useQuery({
+  const {
+    data: cart,
+    refetch: refetchCart,
+    isLoading: isLoadingCart,
+  } = useQuery({
     queryKey: ["cart", user?.user_id],
     queryFn: getCart,
   });
@@ -102,18 +139,19 @@ export const useCart = () => {
     },
   });
 
-  const { mutate: updateItemQuantity, isPending: isUpdatingQuantity } = useMutation({
-    mutationFn: ({
-      product,
-      quantity,
-    }: {
-      product: IProduct;
-      quantity: number;
-    }) => updateQuantityInCart(product, quantity),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["cart", user?.user_id] });
-    },
-  });
+  const { mutate: updateItemQuantity, isPending: isUpdatingQuantity } =
+    useMutation({
+      mutationFn: ({
+        product,
+        quantity,
+      }: {
+        product: IProduct;
+        quantity: number;
+      }) => updateQuantityInCart(product, quantity),
+      onSuccess: () => {
+        queryClient.invalidateQueries({ queryKey: ["cart", user?.user_id] });
+      },
+    });
 
   return {
     cart,
@@ -122,7 +160,10 @@ export const useCart = () => {
     isAddingItem,
     isRemovingItem,
     isUpdatingQuantity,
-    updateItemQuantity, 
+    refetchCart,
+    getTotalQuantity,
+    syncLocalCartToServer,
+    updateItemQuantity,
     removeItem,
   };
 };

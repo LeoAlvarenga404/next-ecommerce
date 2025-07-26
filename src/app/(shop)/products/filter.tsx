@@ -26,11 +26,34 @@ import {
 } from "lucide-react";
 import { useProductFilter } from "@/hooks/use-product-filter";
 import { useCategories } from "@/hooks/use-category";
+import { Checkbox } from "@/components/ui/checkbox";
+import { useEffect } from "react";
 
-export function ProductFilter() {
-  const { filters, setFilter, clearFilters, clearFilter, hasActiveFilters } =
-    useProductFilter();
+interface ProductFilterProps {
+  filter: "all" | "category";
+  categoryId?: string;
+}
+
+export function ProductFilter({
+  filter = "all",
+  categoryId,
+}: ProductFilterProps) {
+  const {
+    filters,
+    setFilter,
+    clearFilters,
+    clearFilter,
+    hasActiveFilters,
+    initializeFilter,
+  } = useProductFilter();
   const { data: categories, isLoading: categoriesLoading } = useCategories();
+
+  // Inicializa o filtro de categoria baseado na URL
+  useEffect(() => {
+    if (filter === "category" && categoryId) {
+      initializeFilter("category", categoryId);
+    }
+  }, [filter, categoryId, initializeFilter]);
 
   const handleClearCategory = () => {
     clearFilter("category");
@@ -130,36 +153,23 @@ export function ProductFilter() {
               </Badge>
             )}
           </div>
-          <Select
-            value={filters.category || undefined}
-            onValueChange={(value) => setFilter("category", value)}
-          >
-            <SelectTrigger className="h-10 border-gray-200 focus:border-primary">
-              <SelectValue placeholder="Todas as categorias" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectGroup>
-                <SelectLabel>Categorias Disponíveis</SelectLabel>
-                {categoriesLoading ? (
-                  <SelectItem value="loading" disabled>
-                    <div className="flex items-center gap-2">
-                      <div className="h-4 w-4 rounded-full bg-gray-200 animate-pulse"></div>
-                      Carregando...
-                    </div>
-                  </SelectItem>
-                ) : (
-                  categories?.map((category) => (
-                    <SelectItem
-                      key={category.category_id}
-                      value={category.category_id}
-                    >
-                      {category.name}
-                    </SelectItem>
-                  ))
-                )}
-              </SelectGroup>
-            </SelectContent>
-          </Select>
+          {categories?.map((category) => (
+            <div key={category.category_id} className="flex items-center gap-2">
+              <Checkbox
+                checked={filters.category === category.category_id}
+                id={`category-${category.category_id}`}
+                onCheckedChange={(checked) =>
+                  setFilter(
+                    "category",
+                    checked ? category.category_id : undefined
+                  )
+                }
+              />
+              <Label htmlFor={`category-${category.category_id}`}>
+                {category.name}
+              </Label>
+            </div>
+          ))}
         </div>
 
         <Separator className="bg-gray-200" />
@@ -216,7 +226,7 @@ export function ProductFilter() {
                 </span>
                 <Input
                   type="number"
-                  placeholder="Sem limite"
+                  placeholder=""
                   value={filters.maxPrice || ""}
                   onChange={(e) => {
                     const value = e.target.value
@@ -229,15 +239,6 @@ export function ProductFilter() {
               </div>
             </div>
           </div>
-
-          {(filters.minPrice || filters.maxPrice) && (
-            <div className="p-3 bg-primary/5 rounded-lg border border-primary/10">
-              <div className="text-sm text-primary font-medium">
-                Faixa selecionada: R$ {filters.minPrice || 0} - R${" "}
-                {filters.maxPrice || "∞"}
-              </div>
-            </div>
-          )}
         </div>
 
         <Separator className="bg-gray-200" />

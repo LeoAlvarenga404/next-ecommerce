@@ -2,9 +2,7 @@
 
 import { ProductImage } from "@/components/custom/image";
 import { AddToCart } from "@/components/custom/add-to-cart";
-import { AddToWishlist } from "@/components/custom/add-to-wishlist";
-import { useProduct } from "@/hooks/use-products";
-import { useParams, useRouter } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -105,8 +103,15 @@ export default function ProductPage({ product }: ProductClientProps) {
               Início
             </Link>
             <span className="mx-2">/</span>
-            <Link href="/" className="hover:text-foreground">
+            <Link href="/products" className="hover:text-foreground">
               Produtos
+            </Link>
+            <span className="mx-2">/</span>
+            <Link
+              href={`/products/${product.Category?.name}`}
+              className="hover:text-foreground"
+            >
+              {product.Category?.name || "Categoria"}
             </Link>
             <span className="mx-2">/</span>
             <span className="text-foreground">{product.name}</span>
@@ -143,10 +148,6 @@ export default function ProductPage({ product }: ProductClientProps) {
                       </Button>
                     </>
                   )}
-
-                  <div className="absolute top-4 right-4 bg-white/90 rounded-full">
-                    <AddToWishlist productId={product.product_id} />
-                  </div>
                 </>
               ) : (
                 <div className="w-full h-full flex items-center justify-center bg-gray-100">
@@ -277,7 +278,7 @@ export default function ProductPage({ product }: ProductClientProps) {
               <div className="flex gap-3">
                 <div className="flex-1">
                   <AddToCart
-                    productId={product.product_id}
+                    product={product}
                     quantity={quantity}
                     variant="button"
                   />
@@ -346,9 +347,8 @@ export default function ProductPage({ product }: ProductClientProps) {
             </CardHeader>
             <CardContent className="space-y-3 text-sm text-muted-foreground">
               <p>• Entrega grátis para pedidos acima de R$ 150</p>
-              <p>• Prazo de entrega: 2-5 dias úteis</p>
-              <p>• Produto com garantia de 12 meses</p>
-              <p>• Troca e devolução em até 30 dias</p>
+              <p>• Lorem ipsum dolor sit amet</p>
+              <p>• Lorem ipsum dolor sit amet</p>
             </CardContent>
           </Card>
         </div>

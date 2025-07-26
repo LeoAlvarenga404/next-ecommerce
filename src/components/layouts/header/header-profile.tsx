@@ -3,14 +3,10 @@ import Link from "next/link";
 
 interface HeaderProfileProps {
   user: any;
-  onLogout: () => void;
-  isLoading?: boolean;
 }
 
 export function HeaderProfile({
   user,
-  onLogout,
-  isLoading = false,
 }: HeaderProfileProps) {
   
   function handleNavigateToProfile() {

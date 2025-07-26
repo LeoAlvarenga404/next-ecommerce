@@ -59,22 +59,9 @@ export function Products() {
   return (
     <div className="w-full mx-auto">
       <div className="flex items-center justify-between mb-6">
-        <div>
-          <h2 className="text-2xl font-bold text-gray-900">
-            {hasFilters ? "Produtos Filtrados" : "Todos os Produtos"}
-          </h2>
-          <p className="text-sm text-gray-600 mt-1">
-            {products.length} produto{products.length !== 1 ? "s" : ""}
-            {hasFilters ? " encontrado" : " disponível"}
-            {products.length !== 1 ? "s" : ""}
-          </p>
-        </div>
 
-        {hasFilters && (
-          <div className="text-sm text-primary bg-primary/10 px-3 py-1 rounded-full">
-            <span className="font-medium">Filtros aplicados</span>
-          </div>
-        )}
+
+
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">

@@ -23,6 +23,16 @@ export function useCategoryByProduct(productId: string) {
   });
 }
 
+export function useCategoryByName(name: string) {
+  return useQuery({
+    queryKey: ["category", "name", name],
+    queryFn: () => categoryService.getCategoryByName(name),
+    staleTime: STALE_TIME,
+    gcTime: GC_TIME,
+    enabled: !!name,
+  });
+}
+
 export function useCreateCategory() {
   const queryClient = useQueryClient();
 
@@ -33,3 +43,4 @@ export function useCreateCategory() {
     },
   });
 }
+

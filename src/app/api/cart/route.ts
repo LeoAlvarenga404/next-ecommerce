@@ -12,6 +12,9 @@ export async function GET() {
     const cart = await prisma.cart.findUnique({
       where: { user_id: session?.user_id },
       include: {
+        _count: {
+          select: { CartItem: true },
+        },
         CartItem: {
           include: {
             product: {
@@ -35,10 +38,28 @@ export async function GET() {
           },
         },
       });
-      return NextResponse.json(newCart, { status: 200 });
+
+      const cartWithTotals = {
+        ...newCart,
+        totalQuantity: 0,
+        uniqueProducts: 0,
+      };
+
+      return NextResponse.json(cartWithTotals, { status: 200 });
     }
 
-    return NextResponse.json(cart, { status: 200 });
+    const totalQuantity = cart.CartItem.reduce(
+      (total, item) => total + item.quantity,
+      0
+    );
+
+    const cartWithTotals = {
+      ...cart,
+      totalQuantity,
+      uniqueProducts: cart._count.CartItem,
+    };
+
+    return NextResponse.json(cartWithTotals, { status: 200 });
   } catch (error) {
     return NextResponse.json(
       { error: "Erro ao buscar o carrinho", details: error },
@@ -136,9 +157,7 @@ export async function POST(request: NextRequest) {
   }
 }
 
-export async function PUT(
-  request: NextRequest
-) {
+export async function PUT(request: NextRequest) {
   try {
     const session = await getSession();
     if (!session) {
@@ -148,7 +167,7 @@ export async function PUT(
     const { id, quantity } = await request.json();
 
     await prisma.cartItem.update({
-      where: { cart_item_id: id },
+      where: { cart_item_id: await getCartItemId(id) },
       data: { quantity },
     });
 
@@ -161,7 +180,7 @@ export async function PUT(
   }
 }
 
-export async function DELETE(request: NextRequest,) {
+export async function DELETE(request: NextRequest) {
   try {
     const session = await getSession();
     if (!session) {
@@ -178,7 +197,7 @@ export async function DELETE(request: NextRequest,) {
     }
 
     await prisma.cartItem.delete({
-      where: { cart_item_id: id },
+      where: { cart_item_id: await getCartItemId(id) },
     });
 
     return NextResponse.json({ message: "Item removido do carrinho" });
@@ -189,3 +208,16 @@ export async function DELETE(request: NextRequest,) {
     );
   }
 }
+
+const getCartItemId = async (product_id: string) => {
+  const session = await getSession();
+
+  const cart = await prisma.cart.findUnique({
+    where: { user_id: session?.session?.user_id },
+    include: { CartItem: true },
+  });
+  const cartItem = cart?.CartItem.find(
+    (item) => item.product_id === product_id
+  );
+  return cartItem?.cart_item_id;
+};

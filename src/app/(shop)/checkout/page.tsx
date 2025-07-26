@@ -46,7 +46,7 @@ export default function CheckoutPage() {
   const [loading, setLoading] = useState(false);
   const { cart } = useCart();
   const { isAuthenticated } = useAuth();
-  const [step, setStep] = useState(3);
+  const [step, setStep] = useState(1);
   const form = useForm<ICheckoutSchema>({
     resolver: zodResolver(checkoutSchema),
     defaultValues: {
@@ -361,7 +361,7 @@ export default function CheckoutPage() {
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-6">
-                  <div className="border-2 border-primary/20 bg-primary/5 rounded-lg p-6">
+                  <Card className="p-4">
                     <div className="flex items-center gap-4">
                       <div className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center">
                         <CreditCard className="w-6 h-6 text-primary" />
@@ -374,24 +374,10 @@ export default function CheckoutPage() {
                           Pagamento seguro processado via Stripe
                         </p>
                       </div>
-                      <Badge>Recomendado</Badge>
                     </div>
-                  </div>
+                  </Card>
 
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-4">
-                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                      <Shield className="w-4 h-4 text-green-600" />
-                      <span>Pagamento 100% seguro</span>
-                    </div>
-                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                      <Truck className="w-4 h-4 text-blue-600" />
-                      <span>Entrega rápida</span>
-                    </div>
-                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                      <Package className="w-4 h-4 text-purple-600" />
-                      <span>Troca grátis</span>
-                    </div>
-                  </div>
+
 
                   <div className="flex justify-between">
                     <Button

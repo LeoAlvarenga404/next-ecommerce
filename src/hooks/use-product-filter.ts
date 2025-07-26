@@ -18,6 +18,7 @@ export interface UseProductFilterReturn {
   clearFilters: () => void;
   clearFilter: (key: keyof ProductFilters) => void;
   hasActiveFilters: boolean;
+  initializeFilter: (key: keyof ProductFilters, value: any) => void; // Nova função
 }
 
 let globalFilters: ProductFilters = {};
@@ -35,12 +36,12 @@ export function useProductFilter(): UseProductFilterReturn {
     forceUpdate({});
   }, []);
 
-  useState(() => {
+  useEffect(() => {
     listeners.add(rerender);
     return () => {
       listeners.delete(rerender);
     };
-  });
+  }, [rerender]);
 
   const setFilter = useCallback((key: keyof ProductFilters, value: any) => {
     const newFilters = {
@@ -56,6 +57,15 @@ export function useProductFilter(): UseProductFilterReturn {
 
     updateGlobalFilters(newFilters);
   }, []);
+
+  const initializeFilter = useCallback(
+    (key: keyof ProductFilters, value: any) => {
+      if (!globalFilters[key] && value) {
+        setFilter(key, value);
+      }
+    },
+    [setFilter]
+  );
 
   const clearFilters = useCallback(() => {
     updateGlobalFilters({});
@@ -75,6 +85,7 @@ export function useProductFilter(): UseProductFilterReturn {
     clearFilters,
     clearFilter,
     hasActiveFilters,
+    initializeFilter,
   };
 }
 
@@ -82,7 +93,7 @@ export function useFilteredProducts(filters: ProductFilters) {
   const [debouncedFilters, setDebouncedFilters] = useState(filters);
 
   useEffect(() => {
-    if (filters.search) {
+    if (filters) {
       const handler = setTimeout(() => {
         setDebouncedFilters(filters);
       }, 100);
@@ -134,6 +145,6 @@ export function useFilteredProducts(filters: ProductFilters) {
     },
     staleTime: 5 * 60 * 1000,
     gcTime: 10 * 60 * 1000,
-    enabled: Object.keys(debouncedFilters).length > 0,
+    enabled: true,
   });
 }
