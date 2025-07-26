@@ -15,6 +15,7 @@ import { Package, MapPin, Calendar, CreditCard, Truck } from "lucide-react";
 import Image from "next/image";
 import { IOrder } from "@/@types/order";
 import { formatPriceToBrazilianCurrency } from "@/utils/formatter/price";
+import { Loading } from "@/components/custom/loading";
 
 const getStatusVariant = (status: string) => {
   switch (status) {
@@ -64,7 +65,11 @@ const formatDate = (dateString: string) => {
 };
 
 export default function OrdersPage() {
-  const { data: orders } = useOrders();
+  const { data: orders, isLoading } = useOrders();
+
+  if (isLoading) {
+    return <Loading />;
+  }
 
   if (!orders || orders.length === 0) {
     return (

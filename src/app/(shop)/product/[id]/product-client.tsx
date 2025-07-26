@@ -21,6 +21,7 @@ import Link from "next/link";
 import { Label } from "@/components/ui/label";
 import { formatPriceToBrazilianCurrency } from "@/utils/formatter/price";
 import { IProduct } from "@/@types/product";
+import { ButtonBuyNow } from "@/components/custom/button-buy-now";
 
 interface ProductClientProps {
   product: IProduct;
@@ -283,11 +284,7 @@ export default function ProductPage({ product }: ProductClientProps) {
                     variant="button"
                   />
                 </div>
-                <Link href="/checkout" className="flex-1">
-                  <Button className="w-full" size="lg" disabled={!isInStock}>
-                    Comprar Agora
-                  </Button>
-                </Link>
+                <ButtonBuyNow product={product}/>
               </div>
             </div>
           </div>

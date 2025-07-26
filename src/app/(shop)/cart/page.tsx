@@ -20,6 +20,7 @@ import {
 import { useState } from "react";
 import { formatPriceToBrazilianCurrency } from "@/utils/formatter/price";
 import { IProduct } from "@/@types/product";
+import { Loading } from "@/components/custom/loading";
 
 interface CartItemAPI {
   cart_item_id: string;
@@ -58,7 +59,6 @@ export default function CartPage() {
       return cart.CartItem;
     }
 
-    // Se for dados do localStorage (array direto)
     if (Array.isArray(cart)) {
       return cart;
     }
@@ -107,7 +107,11 @@ export default function CartPage() {
     return cartItems.reduce((sum: number, item: CartItem) => {
       return (
         sum +
-        calculateValueWithDiscount(item.product.price, item.product.discount || 0) * item.quantity
+        calculateValueWithDiscount(
+          item.product.price,
+          item.product.discount || 0
+        ) *
+          item.quantity
       );
     }, 0);
   };
@@ -117,11 +121,7 @@ export default function CartPage() {
   const total = subtotal + shipping;
 
   if (isLoadingCart) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-primary"></div>
-      </div>
-    );
+    return <Loading />;
   }
 
   if (!cartItems || cartItems.length === 0) {
@@ -173,7 +173,6 @@ export default function CartPage() {
           <Badge variant="secondary">
             {cartItems.length} {cartItems.length === 1 ? "item" : "itens"}
           </Badge>
-
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">

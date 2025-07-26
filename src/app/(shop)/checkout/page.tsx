@@ -20,6 +20,7 @@ import { checkoutSchema, type ICheckoutSchema } from "@/schemas/checkout";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
+  AlertTriangle,
   ArrowLeft,
   ArrowRight,
   Check,
@@ -29,12 +30,14 @@ import {
   Shield,
   Truck,
   User,
+  X,
 } from "lucide-react";
 import { useCart } from "@/hooks/use-cart";
 import { IProduct } from "@/@types/product";
 import Image from "next/image";
 import { formatPriceToBrazilianCurrency } from "@/utils/formatter/price";
 import { calculateValueWithDiscount } from "@/utils/value-with-discount";
+import { toast } from "sonner";
 
 const steps = [
   { id: 1, title: "Informações", icon: User },
@@ -63,7 +66,6 @@ export default function CheckoutPage() {
       },
     },
   });
-  console.log("Cart Items:", cart?.CartItem);
 
   const handleNext = async () => {
     let fieldsToValidate: (keyof ICheckoutSchema)[] = [];
@@ -89,7 +91,62 @@ export default function CheckoutPage() {
     setLoading(true);
 
     if (!isAuthenticated) {
-      alert("Você precisa estar logado para finalizar a compra");
+      toast.custom(
+        (t) => (
+          <div
+            className={`
+        bg-card border border-border rounded-lg shadow-lg overflow-hidden
+        transition-all duration-300 ease-in-out
+
+        max-w-md w-full
+      `}
+          >
+            <div className="p-4">
+              <div className="flex items-start gap-3">
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-2 mb-1">
+                    <h4 className="text-sm font-semibold text-card-foreground">
+                      Acesso necessário
+                    </h4>
+                  </div>
+
+                  <p className="text-sm text-muted-foreground mb-3">
+                    Você precisa estar logado para finalizar a compra.
+                  </p>
+
+                  <Button
+                    asChild
+                    size="sm"
+                    className="h-8 text-xs"
+                    onClick={() => toast.dismiss()}
+                  >
+                    <Link
+                      href="/login"
+                      className="inline-flex items-center gap-1"
+                    >
+                      Fazer login
+                    </Link>
+                  </Button>
+                </div>
+
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="h-8 w-8 p-0 hover:bg-muted"
+                  onClick={() => toast.dismiss()}
+                >
+                  <X className="w-4 h-4" />
+                </Button>
+              </div>
+            </div>
+          </div>
+        ),
+        {
+          duration: 5000,
+          id: "login-required",
+          position: "top-right",
+        }
+      );
       setLoading(false);
       return;
     }
@@ -376,8 +433,6 @@ export default function CheckoutPage() {
                       </div>
                     </div>
                   </Card>
-
-
 
                   <div className="flex justify-between">
                     <Button

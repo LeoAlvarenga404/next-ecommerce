@@ -4,8 +4,15 @@ import Image from "next/image";
 export function FeaturedCategoryItem({ data }: { data: IProductCategory }) {
   const imageUrl = data?.image || "/placeholder-category.png";
 
+  const handleNavigateToCategoryPage = () => {
+    window.location.href = `/products/${data.name}`;
+  };
+
   return (
-    <div className="flex flex-col items-center justify-center gap-4 group cursor-pointer">
+    <div
+      className="flex flex-col items-center justify-center gap-4 group cursor-pointer"
+      onClick={handleNavigateToCategoryPage}
+    >
       <div className="p-4 aspect-square bg-gray-100 w-fit rounded-full overflow-hidden">
         <Image
           src={imageUrl}

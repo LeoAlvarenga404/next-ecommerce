@@ -24,6 +24,7 @@ export function useCategoryByProduct(productId: string) {
 }
 
 export function useCategoryByName(name: string) {
+  
   return useQuery({
     queryKey: ["category", "name", name],
     queryFn: () => categoryService.getCategoryByName(name),
@@ -31,6 +32,7 @@ export function useCategoryByName(name: string) {
     gcTime: GC_TIME,
     enabled: !!name,
   });
+
 }
 
 export function useCreateCategory() {
@@ -43,4 +45,3 @@ export function useCreateCategory() {
     },
   });
 }
-

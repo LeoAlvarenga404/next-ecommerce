@@ -4,16 +4,16 @@ import { prisma } from "@/lib/prisma";
 export async function POST(request: NextRequest) {
   const { name } = await request.json();
 
+  let decodedName = decodeURIComponent(name);
 
   try {
     const category = await prisma.category.findFirst({
       where: {
-      name: {
-        equals: name,
-        mode: "insensitive",
+        name: {
+          equals: decodedName,
+          mode: "insensitive",
+        },
       },
-      },
-
     });
 
     if (!category) {

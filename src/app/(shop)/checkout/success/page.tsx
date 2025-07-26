@@ -3,7 +3,6 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Separator } from "@/components/ui/separator";
 import { useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import Link from "next/link";
@@ -188,16 +187,13 @@ export default function SuccessPage() {
                           <p className="font-medium">{item.product.name}</p>
                           <p className="text-sm text-muted-foreground">
                             Quantidade: {item.quantity} • Preço unitário: R${" "}
-                            {item.unit_price.toLocaleString("pt-BR", {
-                              minimumFractionDigits: 2,
-                            })}
+                            {formatPriceToBrazilianCurrency(item.unit_price)}
                           </p>
                         </div>
                         <span className="font-medium">
                           R${" "}
-                          {(item.unit_price * item.quantity).toLocaleString(
-                            "pt-BR",
-                            { minimumFractionDigits: 2 }
+                          {formatPriceToBrazilianCurrency(
+                            item.unit_price * item.quantity
                           )}
                         </span>
                       </div>

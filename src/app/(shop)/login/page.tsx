@@ -32,6 +32,7 @@ export default function LoginPage() {
 
   function onSubmit(data: LoginFormData) {
     login(data);
+
   }
 
   return (
