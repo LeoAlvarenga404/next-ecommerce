@@ -1,11 +1,13 @@
 import { useAuth } from "@/hooks/use-auth";
 import { LogOutIcon } from "lucide-react";
+import { useRouter } from "next/navigation";
 
 export function Logout() {
   const { isLogoutPending, logout } = useAuth();
-
+  const router = useRouter();
   const handleLogout = () => {
     logout();
+    router.refresh();
   };
 
   return (

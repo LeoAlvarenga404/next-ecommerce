@@ -48,11 +48,9 @@ export default function CartPage() {
   const { user } = useAuth();
   const [isUpdating, setIsUpdating] = useState<string | null>(null);
 
-  // Normaliza os dados do carrinho para funcionar tanto com API quanto localStorage
   const normalizeCartData = () => {
     if (!cart) return [];
 
-    // Se for dados da API
     if (cart.CartItem) {
       return cart.CartItem;
     }

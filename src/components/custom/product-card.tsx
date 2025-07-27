@@ -16,10 +16,15 @@ export function ProductCard({ product }: { product: IProduct }) {
   );
   const hasDiscount = (product.discount || 0) > 0;
 
+  const handleNavigateToProductDetails = (product_id: string) => {
+    window.location.href = `/product/${product_id}`;
+  };
+
   return (
     <Card
       key={product.product_id}
-      className="group hover:shadow-lg transition-all duration-300 border-0 shadow-sm bg-white rounded-xl overflow-hidden p-0 flex flex-col h-full"
+      className="cursor-pointer group hover:shadow-lg transition-all duration-300 border-0 shadow-sm bg-white rounded-xl overflow-hidden p-0 flex flex-col h-full"
+      onClick={() => handleNavigateToProductDetails(product.product_id)}
     >
       <div className="relative aspect-square overflow-hidden bg-gray-50">
         <ProductImage src={product?.ProductImage[0]?.url} alt={product.name} />
@@ -61,7 +66,7 @@ export function ProductCard({ product }: { product: IProduct }) {
           </div>
         </div>
 
-        <div className="flex gap-2 mt-auto">
+        <div className="flex gap-2 mt-auto relative z-10">
           <ButtonBuyNow product={product} />
           <div className="flex items-center">
             <AddToCart product={product} quantity={1} variant="icon" />

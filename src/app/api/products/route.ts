@@ -12,7 +12,7 @@ export async function GET(request: NextRequest) {
     const { searchParams } = request.nextUrl;
     const filters: SeachParams = {
       page: searchParams.get("page") || "1",
-      limit: searchParams.get("limit") || "10",
+      limit: searchParams.get("limit") || "100",
       category: searchParams.get("category") || undefined,
       brand: searchParams.get("brand") || undefined,
       search: searchParams.get("search") || undefined,
@@ -113,3 +113,5 @@ export async function POST(request: NextRequest) {
     );
   }
 }
+
+

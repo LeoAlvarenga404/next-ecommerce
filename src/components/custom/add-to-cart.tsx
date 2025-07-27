@@ -21,7 +21,8 @@ export function AddToCart({
 }) {
   const { addItem, isAddingItem } = useCart();
 
-  const handleAddItemToCart = () => {
+  const handleAddItemToCart = (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.stopPropagation();
     addItem(
       { product, quantity },
       {

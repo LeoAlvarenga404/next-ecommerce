@@ -38,6 +38,8 @@ import Image from "next/image";
 import { formatPriceToBrazilianCurrency } from "@/utils/formatter/price";
 import { calculateValueWithDiscount } from "@/utils/value-with-discount";
 import { toast } from "sonner";
+import { Cart, CartItem } from "@prisma/client";
+import { Separator } from "@/components/ui/separator";
 
 const steps = [
   { id: 1, title: "Informações", icon: User },
@@ -66,6 +68,23 @@ export default function CheckoutPage() {
       },
     },
   });
+
+  const calculateSubtotal = () => {
+    return cart?.CartItem?.reduce((sum: number, item: any) => {
+      return (
+        sum +
+        calculateValueWithDiscount(
+          item.product.price,
+          item.product.discount || 0
+        ) *
+          (item.quantity || 1)
+      );
+    }, 0);
+  };
+
+  const subtotal = calculateSubtotal();
+  const shipping = subtotal > 150 ? 0 : 15;
+  const total = subtotal + shipping;
 
   const handleNext = async () => {
     let fieldsToValidate: (keyof ICheckoutSchema)[] = [];
@@ -560,9 +579,16 @@ export default function CheckoutPage() {
                         </div>
                       );
                     })}
+                    <div className="w-full flex items-center gap-4 justify-between">
+                      <span className="font-bold">Total:</span>
+                      <p className="text-lg font-semibold">
+                        {formatPriceToBrazilianCurrency(total)}
+                      </p>
+                    </div>
                   </div>
+                  <Separator />
 
-                  <div className="border-t pt-6">
+                  <div className="pt-6">
                     <div className="bg-muted/50 rounded-lg p-4">
                       <h4 className="font-semibold mb-2">
                         Método de Pagamento

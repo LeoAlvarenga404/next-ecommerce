@@ -6,7 +6,8 @@ import { toast } from "sonner";
 export function ButtonBuyNow({ product }: { product: IProduct }) {
   const { addItem, isAddingItem } = useCart();
 
-  const handleNavigateToCheckout = () => {
+  const handleNavigateToCheckout = (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.stopPropagation();
     try {
       addItem({ product: product, quantity: 1 });
       window.location.href = "/checkout";
