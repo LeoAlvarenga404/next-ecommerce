@@ -7,9 +7,13 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { AddToCart } from "./add-to-cart";
 import { calculateValueWithDiscount } from "@/utils/value-with-discount";
+import { ButtonBuyNow } from "./button-buy-now";
 
 export function ProductCard({ product }: { product: IProduct }) {
-  const price = calculateValueWithDiscount(product.price, product.discount || 0);
+  const price = calculateValueWithDiscount(
+    product.price,
+    product.discount || 0
+  );
   const hasDiscount = (product.discount || 0) > 0;
 
   return (
@@ -58,20 +62,9 @@ export function ProductCard({ product }: { product: IProduct }) {
         </div>
 
         <div className="flex gap-2 mt-auto">
-          <Link href={`/product/${product.product_id}`} className="flex-1">
-            <Button
-              variant="outline"
-              className="w-full text-sm h-9 hover:bg-primary hover:text-primary-foreground transition-colors"
-            >
-              Ver Detalhes
-            </Button>
-          </Link>
+          <ButtonBuyNow product={product} />
           <div className="flex items-center">
-            <AddToCart
-              product={product}
-              quantity={1}
-              variant="icon"
-            />
+            <AddToCart product={product} quantity={1} variant="icon" />
           </div>
         </div>
       </div>

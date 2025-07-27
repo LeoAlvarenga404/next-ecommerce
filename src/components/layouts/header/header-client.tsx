@@ -30,7 +30,7 @@ export function HeaderClient({ initialSession }: HeaderClientProps) {
     if (initialIsAuthenticated !== isAuthenticated && user !== undefined) {
       router.refresh();
     }
-  }, [isAuthenticated, user, initialSession, router]);
+  }, [isAuthenticated, user, initialSession, router, currentUser]);
 
 
 

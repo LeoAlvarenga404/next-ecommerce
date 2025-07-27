@@ -35,12 +35,10 @@ interface CartItemLocal {
 
 type CartItem = CartItemAPI | CartItemLocal;
 
-// Função para verificar se é um item da API
 const isAPICartItem = (item: CartItem): item is CartItemAPI => {
   return "cart_item_id" in item;
 };
 
-// Função para obter o ID único do item
 const getItemId = (item: CartItem): string => {
   return isAPICartItem(item) ? item.cart_item_id : item.product.product_id;
 };

@@ -6,6 +6,7 @@ import { useParams } from "next/navigation";
 import { useCategoryByName } from "@/hooks/use-category";
 import { useEffect } from "react";
 import { useProductFilter } from "@/hooks/use-product-filter";
+import { Loading } from "@/components/custom/loading";
 
 export default function ProductsPage() {
   const { category } = useParams<{ category: string }>();
@@ -17,13 +18,7 @@ export default function ProductsPage() {
   }, [category, clearFilters]);
 
   if (isLoading) {
-    return (
-      <div className="w-full max-w-[1440px] mx-auto px-1 sm:px-2 lg:px-2 py-8">
-        <div className="flex items-center justify-center h-64">
-          <div className="text-lg text-gray-600">Carregando...</div>
-        </div>
-      </div>
-    );
+    return <Loading />;
   }
 
   return (

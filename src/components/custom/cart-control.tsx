@@ -1,5 +1,3 @@
-"use client";
-
 import { useCart } from "@/hooks/use-cart";
 import { ShoppingBag } from "lucide-react";
 import Link from "next/link";
@@ -7,10 +5,8 @@ import { useEffect } from "react";
 
 export function CartControl() {
   const {
-    cart,
     getTotalQuantity,
     isLoadingCart,
-    refetchCart,
     syncLocalCartToServer,
   } = useCart();
 

@@ -82,7 +82,7 @@ export const useCart = () => {
     if (localCart.length === 0) return;
 
     for (const item of localCart) {
-      await addToCart(item.product, item.quantity);
+      await addToCart(item.product, 1);
     }
 
     clearLocalCart();

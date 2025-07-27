@@ -16,53 +16,8 @@ import Image from "next/image";
 import { IOrder } from "@/@types/order";
 import { formatPriceToBrazilianCurrency } from "@/utils/formatter/price";
 import { Loading } from "@/components/custom/loading";
-
-const getStatusVariant = (status: string) => {
-  switch (status) {
-    case "PAID":
-      return "success";
-    case "FAILED":
-      return "destructive";
-    case "PENDING":
-      return "secondary";
-    case "CONFIRMED":
-      return "info";
-    case "PROCESSING":
-      return "warning";
-    case "SHIPPED":
-      return "info";
-    case "DELIVERED":
-      return "success";
-    case "CANCELLED":
-      return "destructive";
-    default:
-      return "default";
-  }
-};
-
-const getStatusLabel = (status: string) => {
-  const statusMap: { [key: string]: string } = {
-    PENDING: "Pendente",
-    PAID: "Pago",
-    FAILED: "Falhou",
-    CONFIRMED: "Confirmado",
-    PROCESSING: "Processando",
-    SHIPPED: "Enviado",
-    DELIVERED: "Entregue",
-    CANCELLED: "Cancelado",
-  };
-  return statusMap[status] || status;
-};
-
-const formatDate = (dateString: string) => {
-  return new Intl.DateTimeFormat("pt-BR", {
-    day: "2-digit",
-    month: "2-digit",
-    year: "numeric",
-    hour: "2-digit",
-    minute: "2-digit",
-  }).format(new Date(dateString));
-};
+import { getStatusVariant, getStatusLabel } from "@/utils/badge";
+import { formatDate } from "@/utils/formatter/date";
 
 export default function OrdersPage() {
   const { data: orders, isLoading } = useOrders();

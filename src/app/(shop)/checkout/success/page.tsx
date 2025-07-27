@@ -10,6 +10,7 @@ import { CheckCircle, Package, ArrowRight, Download } from "lucide-react";
 import { IOrder } from "@/@types/order";
 import FeedbackCard from "@/components/custom/feedback-card";
 import { formatPriceToBrazilianCurrency } from "@/utils/formatter/price";
+import { getStatusVariant, getStatusLabel } from "@/utils/badge";
 
 export default function SuccessPage() {
   const searchParams = useSearchParams();
@@ -112,9 +113,6 @@ export default function SuccessPage() {
           <h1 className="text-4xl font-bold text-gray-900 mb-2">
             Pedido Confirmado!
           </h1>
-          <p className="text-lg text-muted-foreground">
-            Obrigado pela sua compra. Seu pedido foi processado com sucesso.
-          </p>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -131,7 +129,7 @@ export default function SuccessPage() {
                   <div className="space-y-4">
                     <div className="flex justify-between items-center">
                       <span className="text-muted-foreground">
-                        Número do Pedido:
+                        Código do Pedido:
                       </span>
                       <span className="font-mono font-medium">
                         #{order.order_id.slice(-8).toUpperCase()}
@@ -147,7 +145,9 @@ export default function SuccessPage() {
                     </div>
                     <div className="flex justify-between items-center">
                       <span className="text-muted-foreground">Status:</span>
-                      <Badge variant="default">{order.status}</Badge>
+                      <Badge variant={getStatusVariant(order.status)}>
+                        {getStatusLabel(order.status)}
+                      </Badge>
                     </div>
                     <div className="flex justify-between items-center">
                       <span className="text-muted-foreground">Total:</span>
@@ -203,22 +203,19 @@ export default function SuccessPage() {
               </Card>
             )}
           </div>
-          <div className="space-y-6">
+          <div>
             <Card>
               <CardHeader>
                 <CardTitle className="text-lg">Ações Rápidas</CardTitle>
               </CardHeader>
-              <CardContent className="space-y-3">
+              <CardContent className="flex flex-col gap-4">
                 <Link href="/orders">
                   <Button variant="outline" className="w-full justify-start">
                     <Package className="w-4 h-4 mr-2" />
                     Ver Meus Pedidos
                   </Button>
                 </Link>
-                <Button variant="outline" className="w-full justify-start">
-                  <Download className="w-4 h-4 mr-2" />
-                  Baixar Nota Fiscal
-                </Button>
+
                 <Link href="/">
                   <Button className="w-full justify-start">
                     <ArrowRight className="w-4 h-4 mr-2" />

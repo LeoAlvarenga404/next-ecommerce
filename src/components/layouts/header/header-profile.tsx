@@ -1,4 +1,4 @@
-import { LogOutIcon, User } from "lucide-react";
+import { User } from "lucide-react";
 import Link from "next/link";
 
 interface HeaderProfileProps {
