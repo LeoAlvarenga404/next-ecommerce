@@ -11,7 +11,7 @@ import { Loading } from "@/components/custom/loading";
 export default function ProductsPage() {
   const { category } = useParams<{ category: string }>();
   const { data: categoryData, isLoading } = useCategoryByName(category);
-  const { clearFilters } = useProductFilter();
+  const { clearFilters, filters } = useProductFilter();
 
   useEffect(() => {
     clearFilters();

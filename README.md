@@ -54,9 +54,3 @@ Projeto full stack de e-commerce utilizando **Next.js (App Router)**, **Prisma O
    npm run dev
    ```
 
----
-
-- Para rodar apenas a seed novamente:
-  ```bash
-  npm run seed
-  ```
